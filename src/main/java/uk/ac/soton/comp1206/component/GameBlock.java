@@ -25,7 +25,8 @@ public class GameBlock extends Canvas {
      * The set of colours for different pieces
      */
     public static final Color[] COLOURS = {
-            Color.TRANSPARENT,
+            Color.WHITE,
+            new Color(0,0,0,0.25),
             Color.DEEPPINK,
             Color.RED,
             Color.ORANGE,

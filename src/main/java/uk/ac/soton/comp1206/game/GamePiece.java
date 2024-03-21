@@ -18,6 +18,7 @@ public class GamePiece {
      */
     private int[][] blocks;
 
+    public static int[][] block;
     /**
      * The value of this piece
      */
@@ -37,92 +38,137 @@ public class GamePiece {
         switch (piece) {
             //Line
             case 0 -> {
-                int[][] blocks = {{0, 0, 0}, {1, 1, 1}, {0, 0, 0}};
-                return new GamePiece("Line", blocks, 1);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {1, 1, 1},
+                    {0, 0, 0}};
+                return new GamePiece("Line", block, 1);
             }
 
             //C
             case 1 -> {
-                int[][] blocks = {{0, 0, 0}, {1, 1, 1}, {1, 0, 1}};
-                return new GamePiece("C", blocks, 2);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {1, 1, 1},
+                    {1, 0, 1}};
+                return new GamePiece("C", block, 2);
             }
 
             //Plus
             case 2 -> {
-                int[][] blocks = {{0, 1, 0}, {1, 1, 1}, {0, 1, 0}};
-                return new GamePiece("Plus", blocks, 3);
+                block = new int[][]{
+                    {0, 1, 0},
+                    {1, 1, 1},
+                    {0, 1, 0}};
+                return new GamePiece("Plus", block, 3);
             }
 
             //Dot
             case 3 -> {
-                int[][] blocks = {{0, 0, 0}, {0, 1, 0}, {0, 0, 0}};
-                return new GamePiece("Dot", blocks, 4);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {0, 1, 0},
+                    {0, 0, 0}};
+                return new GamePiece("Dot", block, 4);
             }
 
             //Square
             case 4 -> {
-                int[][] blocks = {{1, 1, 0}, {1, 1, 0}, {0, 0, 0}};
-                return new GamePiece("Square", blocks, 5);
+                block = new int[][]{
+                    {1, 1, 0},
+                    {1, 1, 0},
+                    {0, 0, 0}};
+                return new GamePiece("Square", block, 5);
             }
 
             //L
             case 5 -> {
-                int[][] blocks = {{0, 0, 0}, {1, 1, 1}, {0, 0, 1}};
-                return new GamePiece("L", blocks, 6);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {1, 1, 1},
+                    {0, 0, 1}};
+                return new GamePiece("L", block, 6);
             }
 
             //J
             case 6 -> {
-                int[][] blocks = {{0, 0, 1}, {1, 1, 1}, {0, 0, 0}};
-                return new GamePiece("J", blocks, 7);
+                block = new int[][]{
+                    {0, 0, 1},
+                    {1, 1, 1},
+                    {0, 0, 0}};
+                return new GamePiece("J", block, 7);
             }
 
             //S
             case 7 -> {
-                int[][] blocks = {{0, 0, 0}, {0, 1, 1}, {1, 1, 0}};
-                return new GamePiece("S", blocks, 8);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {0, 1, 1},
+                    {1, 1, 0}};
+                return new GamePiece("S", block, 8);
             }
 
             //Z
             case 8 -> {
-                int[][] blocks = {{1, 1, 0}, {0, 1, 1}, {0, 0, 0}};
-                return new GamePiece("Z", blocks, 9);
+                block = new int[][]{
+                    {1, 1, 0},
+                    {0, 1, 1},
+                    {0, 0, 0}};
+                return new GamePiece("Z", block, 9);
             }
 
             //T
             case 9 -> {
-                int[][] blocks = {{1, 0, 0}, {1, 1, 0}, {1, 0, 0}};
-                return new GamePiece("T", blocks, 10);
+                block = new int[][]{
+                    {1, 0, 0},
+                    {1, 1, 0},
+                    {1, 0, 0}};
+                return new GamePiece("T", block, 10);
             }
 
             //X
             case 10 -> {
-                int[][] blocks = {{1, 0, 1}, {0, 1, 0}, {1, 0, 1}};
-                return new GamePiece("X", blocks, 11);
+                block = new int[][]{
+                    {1, 0, 1},
+                    {0, 1, 0},
+                    {1, 0, 1}};
+                return new GamePiece("X", block, 11);
             }
 
             //Corner
             case 11 -> {
-                int[][] blocks = {{0, 0, 0}, {1, 1, 0}, {1, 0, 0}};
-                return new GamePiece("Corner", blocks, 12);
+                block = new int[][]{
+                    {0, 0, 0},
+                    {1, 1, 0},
+                    {1, 0, 0}};
+                return new GamePiece("Corner", block, 12);
             }
 
             //Inverse Corner
             case 12 -> {
-                int[][] blocks = {{1, 0, 0}, {1, 1, 0}, {0, 0, 0}};
-                return new GamePiece("Inverse Corner", blocks, 13);
+                block = new int[][]{
+                    {1, 0, 0},
+                    {1, 1, 0},
+                    {0, 0, 0}};
+                return new GamePiece("Inverse Corner", block, 13);
             }
 
             //Diagonal
             case 13 -> {
-                int[][] blocks = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-                return new GamePiece("Diagonal", blocks, 14);
+                block = new int[][]{
+                    {1, 0, 0},
+                    {0, 1, 0},
+                    {0, 0, 1}};
+                return new GamePiece("Diagonal", block, 14);
             }
 
             //Double
             case 14 -> {
-                int[][] blocks = {{0, 1, 0}, {0, 1, 0}, {0, 0, 0}};
-                return new GamePiece("Double", blocks, 15);
+                block = new int[][]{
+                    {0, 1, 0},
+                    {0, 1, 0},
+                    {0, 0, 0}};
+                return new GamePiece("Double", block, 15);
             }
         }
 

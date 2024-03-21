@@ -53,6 +53,11 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
+        for (int i = 0; i < 5; i++){
+            for (int j = 0; j < 5; j++){
+                grid.set(i,j,1);
+            }
+        }
     }
 
     /**
@@ -60,26 +65,61 @@ public class Game {
      * @param gameBlock the block that was clicked
      */
     public void blockClicked(GameBlock gameBlock) {
-        //Get the position of this block
+        //Get the position of this piece
+        GamePiece gamePiece = GamePiece.createPiece(5);
+        int [][] piece = GamePiece.block;
         int x = gameBlock.getX();
         int y = gameBlock.getY();
-
-        //Get the new value for this block
-        int previousValue = grid.get(x,y);
-        int newValue = previousValue + 1;
-        if (newValue  > GamePiece.PIECES) {
-            newValue = 0;
+        System.out.println(x + "\n" + y);
+        //Update the grid with the new piece
+        if (checkPieceFits(x, y, piece)){
+            setPiece(x, y, piece, gamePiece);
         }
+    }
 
-        //Update the grid with the new value
-        grid.set(x,y,newValue);
+  /**
+   *
+   * @param x x-coordinate of the block clicked
+   * @param y y-coordinate of the block clicked
+   * @param piece array containing the piece to be inserted
+   * @param gamePiece piece to be inserted
+   */
+  private void setPiece(int x, int y, int[][] piece, GamePiece gamePiece) {
+        for (int i = x - 1; i <= x + 1; i++){
+            for (int j = y - 1; j <= y + 1; j++){
+                if (piece[i - x + 1][j - y + 1] > 0){
+                    logger.info("Trying to put gamePiece");
+                    grid.set(i, j, gamePiece.getValue());
+                }
+            }
+        }
     }
 
     /**
-     * Get the grid model inside this game representing the game state of the board
-     * @return game grid model
+     *
+     * @param x x-coordinate of the block clicked
+     * @param y y-coordinate of the block clicked
+     * @param piece array containing the piece to be inserted
+     * @return whether the piece fits or not
      */
-    public Grid getGrid() {
+    private boolean checkPieceFits(int x, int y, int[][] piece) {
+        for (int i = x - 1; i <= x + 1; i++) {
+          for (int j = y - 1; j <= y + 1; j++) {
+              if (piece[i - x + 1][j - y + 1] > 0){
+                  if (grid.get(i,j) != 1){
+                      return false;
+                  }
+              }
+          }
+        }
+        return true;
+    }
+
+  /**
+   * Get the grid model inside this game representing the game state of the board
+   * @return game grid model
+   */
+  public Grid getGrid() {
         return grid;
     }
 
