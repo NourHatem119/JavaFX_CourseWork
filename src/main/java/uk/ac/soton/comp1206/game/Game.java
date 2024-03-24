@@ -76,8 +76,10 @@ public class Game {
         if (checkPieceFits(x, y, piece)){
             setPiece(x, y, piece, currentPiece);
         }
+
         int[] fullRows = new int[grid.getRows()];
         int[] fullCols = new int[grid.getCols()];
+        //checks all the columns if there are any columns to be cleared
         for (int col = 0; col < grid.getCols(); col++){
           fullCols[col] = checkColFull(col);
           if (fullCols[col] == 1){
@@ -88,6 +90,7 @@ public class Game {
           }
           fullCols[col] = 0;
         }
+        //checks all the rows if there are any rows to be cleared
         for (int row = 0; row < grid.getRows(); row++){
           fullRows[row] = checkRowFull(row);
           if (fullRows[row] == 1){
@@ -139,7 +142,12 @@ public class Game {
         return true;
     }
 
-    private int checkRowFull(int row){
+  /**
+   *
+   * @param row The row to be checked
+   * @return whether the row is full or not
+   */
+  private int checkRowFull(int row){
       //TODO check row full
       if(grid.get(0,row) != 1 && grid.get(1,row) != 1 && grid.get(2,row) != 1 && grid.get(3,row) != 1 && grid.get(4,row) != 1){
         return 1;
@@ -148,7 +156,12 @@ public class Game {
       }
     }
 
-    private int checkColFull(int col){
+  /**
+   *
+   * @param col The column to be checked
+   * @return whether the column is full or not
+   */
+  private int checkColFull(int col){
       //TODO check column full
       if(grid.get(col,0) != 1 && grid.get(col,1) != 1 && grid.get(col,2) != 1 && grid.get(col,
           3) != 1 && grid.get(col,4) != 1){
