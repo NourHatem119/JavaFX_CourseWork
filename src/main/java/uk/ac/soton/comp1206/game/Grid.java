@@ -46,7 +46,7 @@ public class Grid {
         //Add a SimpleIntegerProperty to every block in the grid
         for(var y = 0; y < rows; y++) {
             for(var x = 0; x < cols; x++) {
-                grid[x][y] = new SimpleIntegerProperty(0);
+                grid[x][y] = new SimpleIntegerProperty(1);
             }
         }
     }

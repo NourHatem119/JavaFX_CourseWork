@@ -42,7 +42,7 @@ public class GamePiece {
                     {0, 0, 0},
                     {1, 1, 1},
                     {0, 0, 0}};
-                return new GamePiece("Line", block, 1);
+                return new GamePiece("Line", block, 3);
             }
 
             //C

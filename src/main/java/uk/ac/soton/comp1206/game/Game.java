@@ -1,5 +1,7 @@
 package uk.ac.soton.comp1206.game;
 
+import java.util.Random;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
@@ -26,6 +28,8 @@ public class Game {
      * The grid model linked to the game
      */
     protected final Grid grid;
+    public GamePiece currentPiece;
+    public Text name = new Text();
 
     /**
      * Create a new game with the specified rows and columns. Creates a corresponding grid model.
@@ -53,11 +57,6 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
-        for (int i = 0; i < 5; i++){
-            for (int j = 0; j < 5; j++){
-                grid.set(i,j,1);
-            }
-        }
     }
 
     /**
@@ -66,15 +65,40 @@ public class Game {
      */
     public void blockClicked(GameBlock gameBlock) {
         //Get the position of this piece
-        GamePiece gamePiece = GamePiece.createPiece(5);
+        Random rand = new Random();
+        currentPiece = GamePiece.createPiece(rand.nextInt(15));
+        name.setText(currentPiece.toString());
         int [][] piece = GamePiece.block;
         int x = gameBlock.getX();
         int y = gameBlock.getY();
         System.out.println(x + "\n" + y);
         //Update the grid with the new piece
         if (checkPieceFits(x, y, piece)){
-            setPiece(x, y, piece, gamePiece);
+            setPiece(x, y, piece, currentPiece);
         }
+        int[] fullRows = new int[grid.getRows()];
+        int[] fullCols = new int[grid.getCols()];
+        for (int col = 0; col < grid.getCols(); col++){
+          fullCols[col] = checkColFull(col);
+          if (fullCols[col] == 1){
+            logger.info("Column Cleared");
+            for (int rows = 0; rows < grid.getRows(); rows++){
+              grid.set(col, rows, 1);
+            }
+          }
+          fullCols[col] = 0;
+        }
+        for (int row = 0; row < grid.getRows(); row++){
+          fullRows[row] = checkRowFull(row);
+          if (fullRows[row] == 1){
+            logger.info("Row Cleared");
+            for (int cols = 0; cols < grid.getRows(); cols++){
+              grid.set(cols, row, 1);
+            }
+          }
+          fullRows[row] = 0;
+        }
+
     }
 
   /**
@@ -113,6 +137,25 @@ public class Game {
           }
         }
         return true;
+    }
+
+    private int checkRowFull(int row){
+      //TODO check row full
+      if(grid.get(0,row) != 1 && grid.get(1,row) != 1 && grid.get(2,row) != 1 && grid.get(3,row) != 1 && grid.get(4,row) != 1){
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    private int checkColFull(int col){
+      //TODO check column full
+      if(grid.get(col,0) != 1 && grid.get(col,1) != 1 && grid.get(col,2) != 1 && grid.get(col,
+          3) != 1 && grid.get(col,4) != 1){
+        return 1;
+      } else {
+        return 0;
+      }
     }
 
   /**
