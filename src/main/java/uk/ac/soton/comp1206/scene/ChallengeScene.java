@@ -64,7 +64,7 @@ public class ChallengeScene extends BaseScene {
     }
 
     /**
-     * Setup the game object and model
+     * Set up the game object and model
      */
     public void setupGame() {
         logger.info("Starting a new challenge");

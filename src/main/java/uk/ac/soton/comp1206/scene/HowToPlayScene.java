@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,20 +43,25 @@ public class HowToPlayScene extends BaseScene{
     var instructionsText = new Text("TetrECS is a fast-paced gravity-free block placement game, "
         + "where you must survive by clearing rows through careful placement of the upcoming "
         + "blocks before the time runs out. Lose all 3 lives and you're destroyed!");
+    instructionsText.setWrappingWidth(820);
     instructionsText.getStyleClass().add("instructions");
     howToPlayPane.setMaxWidth(gameWindow.getWidth());
     howToPlayPane.setMaxHeight(gameWindow.getHeight());
     howToPlayPane.getStyleClass().add("menu-background");
+    //Set Up the How to Play Image
     ImageView imageView = new ImageView();
-    Image image = new Image("D:\\Projects\\Java\\Year1Semester2\\ProgrammingII\\coursework\\src\\main\\resources\\images\\Instructions.png");
+    Image image = new Image("D:\\Projects\\Java\\Year1Semester2\\ProgrammingII\\coursework\\src"
+        + "\\main\\resources\\images\\Instructions.png");
     imageView.setImage(image);
     imageView.setPreserveRatio(true);
     imageView.setFitHeight(gameWindow.getHeight());
     imageView.setFitWidth(gameWindow.getWidth());
-    howToPlayPane.getChildren().add(title);
-    howToPlayPane.getChildren().add(instructionsText);
-    StackPane.setAlignment(title, Pos.TOP_CENTER);
-    StackPane.setAlignment(instructionsText, Pos.TOP_CENTER);
+
+    VBox instructions = new VBox();
+    instructions.getChildren().addAll(title, instructionsText);
+    instructions.setAlignment(Pos.TOP_CENTER);
+//    StackPane.setAlignment(instructions, Pos.TOP_CENTER);
+    howToPlayPane.getChildren().add(instructions);
     howToPlayPane.getChildren().add(imageView);
     root.getChildren().add(howToPlayPane);
 
