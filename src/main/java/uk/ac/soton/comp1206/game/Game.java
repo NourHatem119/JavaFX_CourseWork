@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.NextPieceListener;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
@@ -17,24 +18,35 @@ import uk.ac.soton.comp1206.component.GameBlockCoordinate;
  */
 public class Game {
 
-    private static final Logger logger = LogManager.getLogger(Game.class);
+  private static final Logger logger = LogManager.getLogger(Game.class);
 
-    /**
-     * Number of rows
-     */
-    protected final int rows;
+  /**
+   * Number of rows
+   */
+  protected final int rows;
 
-    /**
-     * Number of columns
-     */
-    protected final int cols;
+  /**
+   * Number of columns
+   */
+  protected final int cols;
 
-    /**
-     * The grid model linked to the game
-     */
-    protected final Grid grid;
+  /**
+   * The grid model linked to the game
+   */
+  protected final Grid grid;
 
-    protected GamePiece currentPiece ;
+  public GamePiece getCurrentPiece() {
+    return currentPiece;
+  }
+
+  protected GamePiece currentPiece ;
+
+  public GamePiece getNextPiece() {
+    return nextPiece;
+  }
+
+  protected GamePiece nextPiece ;
+  public NextPieceListener nextPieceListener;
 
   public int getScore() {
     return score.get();
@@ -116,7 +128,8 @@ public class Game {
      */
     public void initialiseGame() {
         logger.info("Initialising game");
-        currentPiece=spawnPiece();
+        currentPiece = spawnPiece();
+        nextPiece = spawnPiece();
     }
 
     /**
@@ -161,12 +174,16 @@ public class Game {
     }
 
   public static GamePiece spawnPiece() {
-      logger.info("Spawning a new Piece...");
-      Random rand = new Random();
-      return GamePiece.createPiece(rand.nextInt(GamePiece.PIECES));
+    logger.info("Spawning a new Piece...");
+    Random rand = new Random();
+    return GamePiece.createPiece(rand.nextInt(GamePiece.PIECES));
   }
   private void nextPiece() {
-    currentPiece = spawnPiece();
+    currentPiece = nextPiece;
+    nextPiece = spawnPiece();
+    if (nextPieceListener != null) {
+      nextPieceListener.nextPiece(currentPiece, nextPiece);
+    }
     logger.info("Current Piece: {}", currentPiece);
   }
   /**
@@ -175,29 +192,32 @@ public class Game {
   private void afterPiece() {
     logger.info("Piece Placed, running afterPiece Procedures...");
     int blocksCleared = 0;
-    HashSet<GameBlockCoordinate> blocksToClear=new HashSet<>();
-    boolean[] fullRows = new boolean[grid.getRows()];
-    boolean[] fullCols = new boolean[grid.getCols()];
+    int linesCleared = 0;
+    HashSet<GameBlockCoordinate> blocksToClear = new HashSet<>();
     for (int col = 0; col < grid.getCols(); col++){
       HashSet<GameBlockCoordinate> candidateBlocks=checkColFull(col);
       if(!candidateBlocks.isEmpty()) {
-        fullCols[col] = true;
+        linesCleared++;
         blocksToClear.addAll(candidateBlocks);
       }
     }
     for (int row = 0; row < grid.getRows(); row++){
       HashSet<GameBlockCoordinate> candidateBlocks=checkRowFull(row);
       if(!candidateBlocks.isEmpty()) {
-        fullRows[row] = true;
+        linesCleared++;
         blocksToClear.addAll(candidateBlocks);
       }
 
     }
     logger.info("Blocks To Clear {}", blocksToClear.size());
     for (GameBlockCoordinate block : blocksToClear) {
+      blocksCleared++;
       grid.set(block.getX(),block.getY(),0);
     }
-//    int linesCleared = 0;
+
+    score(linesCleared, blocksCleared);
+    multiplier(linesCleared);
+    setLevel(getScore() / 1000);
 //    for (int i = 0; i < grid.getCols(); i++) {
 //      if (fullCols[i] == 1) {
 //        logger.info("Column Cleared");
@@ -252,5 +272,38 @@ public class Game {
       blocksToClear.add(new GameBlockCoordinate(i,row));
     }
     return blocksToClear;
+  }
+
+  protected void score(int numberOfLines, int numberOfBlocks) {
+    setScore((numberOfLines * numberOfBlocks * 10 * getMultiplier()) + getScore());
+  }
+
+  protected void multiplier(int linesCleared) {
+    if (linesCleared > 0)
+      setMultiplier(getMultiplier() + 1);
+    else
+      setMultiplier(1);
+  }
+
+  public void rotateCurrentPiece(String rotationdirection) {
+    if (rotationdirection.equals("right")) {
+      currentPiece.rotate();
+    } else if (rotationdirection.equals("left")) {
+      currentPiece.rotate(3);
+    }
+  }
+
+  /**
+   * Handles swapping pieces.
+   */
+  public void swapPieces() {
+    logger.info("Swapping Pieces...");
+    var temp = this.currentPiece;
+    this.currentPiece = this.nextPiece;
+    this.nextPiece = temp;
+  }
+
+  public void setOnNextPiece(NextPieceListener listener) {
+    this.nextPieceListener = listener;
   }
 }

@@ -135,4 +135,15 @@ public class Grid {
         }
     }
 
+    /**
+     *
+     * removes all the blocks currently on the grid
+     */
+    public void clean() {
+        for (int x = 0; x < this.cols; x++) {
+            for (int y = 0; y < this.rows; y++)
+                this.grid[x][y].set(0);
+        }
+    }
+
 }

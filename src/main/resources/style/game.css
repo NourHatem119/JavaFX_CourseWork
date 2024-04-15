@@ -7,12 +7,12 @@
 }
 
 .menu-background {
-    -fx-background-image: url("../images/1.jpg");
+    -fx-background-image: url("../_images/1.jpg");
     -fx-background-size: cover;
 }
 
 .challenge-background {
-    -fx-background-image: url("../images/2.jpg");
+    -fx-background-image: url("../_images/2.jpg");
     -fx-background-size: cover;
 }
 

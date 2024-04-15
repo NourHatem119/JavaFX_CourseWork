@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,6 +43,10 @@ public class GameBlock extends Canvas {
             Color.MEDIUMPURPLE,
             Color.PURPLE
     };
+
+    public GameBoard getGameBoard() {
+        return gameBoard;
+    }
 
     private final GameBoard gameBoard;
 
@@ -179,6 +184,12 @@ public class GameBlock extends Canvas {
      */
     public void bind(ObservableValue<? extends Number> input) {
         value.bind(input);
+    }
+
+    public void paintCircle() {
+        GraphicsContext g = getGraphicsContext2D();
+        g.setFill(new Color(0.75,0.75,0.75,0.75));
+        g.fillOval(width / 10, height / 10, width * 0.8, height * 0.8);
     }
 
 }

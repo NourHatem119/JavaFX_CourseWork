@@ -1,6 +1,8 @@
 package uk.ac.soton.comp1206.scene;
 
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
@@ -51,6 +53,12 @@ public abstract class BaseScene {
      */
     public Scene getScene() {
         return this.scene;
+    }
+
+    protected void keyClicked (KeyEvent keyClicked) {
+        if (keyClicked.getCode().equals(KeyCode.ESCAPE)){
+            gameWindow.startMenu();
+        }
     }
 
 }
