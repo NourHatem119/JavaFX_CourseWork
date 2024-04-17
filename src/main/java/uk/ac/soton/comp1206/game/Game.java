@@ -4,12 +4,19 @@ package uk.ac.soton.comp1206.game;
 
 import java.util.HashSet;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.GameLoopListener;
+import uk.ac.soton.comp1206.event.GameOverListener;
 import uk.ac.soton.comp1206.event.LineClearedListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
@@ -37,6 +44,10 @@ public class Game {
    */
   protected final Grid grid;
 
+  private Timer timer;
+
+  private ScheduledExecutorService executor;
+
   public GamePiece getCurrentPiece() {
     return currentPiece;
   }
@@ -51,6 +62,9 @@ public class Game {
   public NextPieceListener nextPieceListener;
 
   public LineClearedListener lineClearedListener;
+
+  public GameLoopListener gameLoopListener;
+  public GameOverListener gameOverListener;
 
   public int getScore() {
     return score.get();
@@ -117,6 +131,7 @@ public class Game {
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols,rows);
+        this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
     /**
@@ -134,6 +149,7 @@ public class Game {
         logger.info("Initialising game");
         currentPiece = spawnPiece();
         nextPiece = spawnPiece();
+        createTimer();
     }
 
     /**
@@ -148,6 +164,7 @@ public class Game {
 
       if(grid.canPlayPiece(x,y,currentPiece)) {
         grid.playPiece(x, y, currentPiece);
+        restartTimer();
         afterPiece();
         nextPiece();
         return true;
@@ -216,7 +233,9 @@ public class Game {
 
     }
     logger.info("Blocks To Clear {}", blocksToClear.size());
-    lineCleared(blocksToClear);
+    if (linesCleared != 0) {
+      lineCleared(blocksToClear);
+    }
     score(linesCleared, blocksToClear.size());
     multiplier(linesCleared);
   }
@@ -302,5 +321,56 @@ public class Game {
     if (lineClearedListener != null) {
       lineClearedListener.lineCleared(blocks);
     }
+  }
+
+  public int getTimerDelay() {
+    return Math.max(2500, 12000 - 500 * getLevel());
+  }
+
+  public void setGameLoop(GameLoopListener listener) {
+    this.gameLoopListener = listener;
+  }
+
+  public void gameLoop () {
+    if (getLives() <= 0) {
+      timer.cancel();
+      if (gameOverListener != null) {
+        endGame();
+        Platform.runLater(() -> gameOverListener.gameOver(this));
+      }
+    } else {
+      setLives(getLives() - 1);
+      nextPiece();
+      setMultiplier(1);
+      createTimer();
+    }
+  }
+
+  private void createTimer() {
+    timer = new Timer();
+    TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        gameLoop();
+      }
+    };
+    timer.schedule(task, getTimerDelay());
+    if (gameLoopListener != null) {
+      gameLoopListener.gameLoop(getTimerDelay());
+    }
+  }
+
+  private void restartTimer() {
+    timer.cancel();
+    timer.purge();
+    createTimer();
+  }
+
+  private void endGame() {
+    executor.shutdownNow();
+  }
+
+  public void setOnGameOver(GameOverListener listener) {
+    this.gameOverListener = listener;
   }
 }

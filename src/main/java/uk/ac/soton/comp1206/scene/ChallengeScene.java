@@ -1,7 +1,11 @@
 package uk.ac.soton.comp1206.scene;
 
 import java.io.File;
+import java.security.Key;
 import java.util.HashSet;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
@@ -12,7 +16,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
@@ -37,6 +44,7 @@ public class ChallengeScene extends BaseScene {
       gameWindow.getHeight() / 4);
   PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4, gameWindow.getHeight() / 4);
   GameBoard board;
+  Rectangle timeBar;
   private final Multimedia multimedia = new Multimedia();
   private final String path = "d:\\Uni\\Programming_II\\Coursework\\coursework\\src\\main"
       + "\\resources";
@@ -51,6 +59,8 @@ public class ChallengeScene extends BaseScene {
       new Media(new File(path + "\\sounds\\fail.wav").toURI().toString());
   private final Media levelUpEffect =
       new Media(new File(path + "\\sounds\\level.wav").toURI().toString());
+  private final Media gameOverEffect =
+      new Media(new File(path + "\\sounds\\explode.wav").toURI().toString());
 
 
   /**
@@ -83,6 +93,11 @@ public class ChallengeScene extends BaseScene {
     var level = new Text();
     var lives = new Text();
     var multiplier = new Text();
+    timeBar = new Rectangle();
+    VBox bottomBar = new VBox(timeBar);
+    timeBar.setFill(Color.LIMEGREEN);
+    timeBar.setHeight(20.0);
+    timeBar.setWidth(gameWindow.getWidth());
     sideBar.getChildren().addAll(level, lives, multiplier);
 
     // Bind the Score, Level, Lives, and Multiplier to their corresponding property.
@@ -112,6 +127,7 @@ public class ChallengeScene extends BaseScene {
     mainPane.setCenter(board);
     mainPane.setRight(sideBar);
     mainPane.setLeft(score);
+    mainPane.setBottom(bottomBar);
 
     //Handle block on gameboard grid being clicked
     board.setOnBlockClick(this::blockClicked);
@@ -120,6 +136,31 @@ public class ChallengeScene extends BaseScene {
     game.setOnNextPiece(this::nextPiece);
     board.setOnRightClicked(this::rightClicked);
     game.setOnLineCleared(this::lineCleared);
+    game.setGameLoop(this::gameLoop);
+    game.setOnGameOver(this::gameOver);
+  }
+
+  private void gameLoop(int i) {
+    logger.info("GameLoop Started...");
+    Timeline timePass = new Timeline(
+        new KeyFrame(Duration.ZERO, new KeyValue(timeBar.widthProperty(), gameWindow.getWidth())),
+        new KeyFrame(Duration.ZERO, new KeyValue(timeBar.fillProperty(), Color.LIMEGREEN)),
+        new KeyFrame(Duration.millis((double) i / 2), new KeyValue(timeBar.fillProperty(),
+            Color.ORANGE)),
+        new KeyFrame(Duration.millis(i), new KeyValue(timeBar.fillProperty(),
+            Color.RED)),
+        new KeyFrame(Duration.millis(i), new KeyValue(timeBar.widthProperty(), 0))
+    );
+    timePass.setCycleCount(1);
+    Timeline colorChange = new Timeline(
+        new KeyFrame(Duration.ZERO, e -> timeBar.setFill(Color.LIMEGREEN)),
+        new KeyFrame(Duration.millis((double) i / 2), e -> timeBar.setFill(Color.ORANGE)),
+        new KeyFrame(Duration.millis(i), e -> timeBar.setFill(Color.RED))
+    );
+    colorChange.setCycleCount(1);
+    timePass.play();
+    colorChange.play();
+
   }
 
   private void rightClicked(MouseEvent event) {
@@ -142,6 +183,7 @@ public class ChallengeScene extends BaseScene {
       if (!canPlay) {
         multimedia.playAudio(failEffect);
       } else {
+        multimedia.playAudio(placeEffect);
         boolean leveledUp = game.levelUp();
         if (leveledUp) {
           multimedia.playAudio(levelUpEffect);
@@ -192,7 +234,7 @@ public class ChallengeScene extends BaseScene {
 
 
   @Override
-  public void keyClicked(KeyEvent keyClicked) {
+  protected void keyClicked(KeyEvent keyClicked) {
     if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
       multimedia.stopMusic();
       gameWindow.startMenu();
@@ -228,22 +270,28 @@ public class ChallengeScene extends BaseScene {
     nextPieceShow.showPiece(game.getNextPiece());
   }
 
-  public void nextPiece(GamePiece currentPiece, GamePiece nextPiece) {
+  private void nextPiece(GamePiece currentPiece, GamePiece nextPiece) {
     currentPieceShow.showPiece(currentPiece);
     nextPieceShow.showPiece(nextPiece);
   }
 
-  public void rotateCurrentPiece(GamePiece currentPiece, String direction) {
+  private void rotateCurrentPiece(GamePiece currentPiece, String direction) {
     multimedia.playAudio(rotateEffect);
     game.rotateCurrentPiece(direction);
     logger.info("Current Piece Rotated...");
     currentPieceShow.showPiece(currentPiece);
   }
 
-  public void lineCleared(HashSet<GameBlockCoordinate> blocks) {
+  private void lineCleared(HashSet<GameBlockCoordinate> blocks) {
     multimedia.playAudio(lineClearEffect);
     logger.info("Blocks Coordinates {}", blocks);
     board.fadeOut(blocks);
+  }
+
+  private void gameOver(Game currentGame) {
+    multimedia.stopMusic();
+    gameWindow.startScoresScene();
+    multimedia.playAudio(gameOverEffect);
   }
 
 }
