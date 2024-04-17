@@ -10,7 +10,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBlockCoordinate;
+import uk.ac.soton.comp1206.event.LineClearedListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.scene.ChallengeScene;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
@@ -47,6 +49,8 @@ public class Game {
 
   protected GamePiece nextPiece ;
   public NextPieceListener nextPieceListener;
+
+  public LineClearedListener lineClearedListener;
 
   public int getScore() {
     return score.get();
@@ -136,16 +140,19 @@ public class Game {
      * Handle what should happen when a particular block is clicked
      * @param gameBlock the block that was clicked
      */
-    public void blockClicked(GameBlock gameBlock) {
+    public boolean blockClicked(GameBlock gameBlock) {
         //Get the position of this block
         int x = gameBlock.getX();
         int y = gameBlock.getY();
 
 
-      if(grid.canPlayPiece(x,y,currentPiece)){
-        grid.playPiece(x,y,currentPiece);
+      if(grid.canPlayPiece(x,y,currentPiece)) {
+        grid.playPiece(x, y, currentPiece);
         afterPiece();
         nextPiece();
+        return true;
+      } else {
+        return false;
       }
     }
 
@@ -191,7 +198,6 @@ public class Game {
    */
   private void afterPiece() {
     logger.info("Piece Placed, running afterPiece Procedures...");
-    int blocksCleared = 0;
     int linesCleared = 0;
     HashSet<GameBlockCoordinate> blocksToClear = new HashSet<>();
     for (int col = 0; col < grid.getCols(); col++){
@@ -202,7 +208,7 @@ public class Game {
       }
     }
     for (int row = 0; row < grid.getRows(); row++){
-      HashSet<GameBlockCoordinate> candidateBlocks=checkRowFull(row);
+      HashSet<GameBlockCoordinate> candidateBlocks = checkRowFull(row);
       if(!candidateBlocks.isEmpty()) {
         linesCleared++;
         blocksToClear.addAll(candidateBlocks);
@@ -210,34 +216,15 @@ public class Game {
 
     }
     logger.info("Blocks To Clear {}", blocksToClear.size());
-    for (GameBlockCoordinate block : blocksToClear) {
-      blocksCleared++;
-      grid.set(block.getX(),block.getY(),0);
-    }
-
-    score(linesCleared, blocksCleared);
+    lineCleared(blocksToClear);
+    score(linesCleared, blocksToClear.size());
     multiplier(linesCleared);
+  }
+
+  public boolean levelUp() {
+    var oldLevel = getLevel();
     setLevel(getScore() / 1000);
-//    for (int i = 0; i < grid.getCols(); i++) {
-//      if (fullCols[i] == 1) {
-//        logger.info("Column Cleared");
-//        blocksCleared += clear(i, "col");
-//        linesCleared++;
-//      }
-//      if (fullRows[i] == 1) {
-//        logger.info("Row Cleared");
-//        blocksCleared += clear(i, "row");
-//        linesCleared++;
-//      }
-//    }
-//    int scoreIncrease = linesCleared * blocksCleared * 10 * multiplier.get() + score.get();
-//    if (linesCleared != 0) {
-//      setMultiplier(getMultiplier() + 1);
-//    } else {
-//      setMultiplier(1);
-//    }
-//    score.set(scoreIncrease);
-//    setLevel(score.get() / 1000);
+    return oldLevel < getLevel();
   }
 
   /**
@@ -285,10 +272,10 @@ public class Game {
       setMultiplier(1);
   }
 
-  public void rotateCurrentPiece(String rotationdirection) {
-    if (rotationdirection.equals("right")) {
+  public void rotateCurrentPiece(String direction) {
+    if (direction.equals("right")) {
       currentPiece.rotate();
-    } else if (rotationdirection.equals("left")) {
+    } else if (direction.equals("left")) {
       currentPiece.rotate(3);
     }
   }
@@ -305,5 +292,15 @@ public class Game {
 
   public void setOnNextPiece(NextPieceListener listener) {
     this.nextPieceListener = listener;
+  }
+
+  public void setOnLineCleared(LineClearedListener listener) {
+    this.lineClearedListener = listener;
+  }
+
+  private void lineCleared(HashSet<GameBlockCoordinate> blocks) {
+    if (lineClearedListener != null) {
+      lineClearedListener.lineCleared(blocks);
+    }
   }
 }

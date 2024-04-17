@@ -1,11 +1,16 @@
 package uk.ac.soton.comp1206.component;
 
+import java.util.HashSet;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
 import uk.ac.soton.comp1206.event.RightClickedListener;
+import uk.ac.soton.comp1206.game.Game;
+import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
 
 /**
@@ -41,6 +46,12 @@ public class GameBoard extends GridPane {
    * The visual height of the board - has to be specified due to being a Canvas
    */
   protected final double height;
+
+  public GameBlock getCurrentBlock() {
+    return currentBlock;
+  }
+
+  private GameBlock currentBlock;
 
   /**
    * The grid this GameBoard represents
@@ -152,7 +163,16 @@ public class GameBoard extends GridPane {
     block.bind(grid.getGridProperty(x,y));
 
     //Add a mouse click handler to the block to trigger GameBoard blockClicked method
-    block.setOnMouseClicked((e) -> blockClicked(e, block));
+    block.setOnMouseClicked(e -> {
+      if (e.getButton().equals(MouseButton.PRIMARY)) {
+        blockClicked(e, block);
+      } else if (e.getButton().equals(MouseButton.SECONDARY)) {
+        rightClicked(e);
+      }
+    });
+
+    block.setOnMouseEntered((e -> hoverBlock(block)));
+    block.setOnMouseExited((e -> unhover(block)));
 
     return block;
   }
@@ -174,7 +194,7 @@ public class GameBoard extends GridPane {
     logger.info("Block clicked: {}", block);
 
     if(blockClickedListener != null) {
-      blockClickedListener.blockClicked(block);
+      blockClickedListener.blockClicked(block, event);
     }
   }
 
@@ -190,6 +210,84 @@ public class GameBoard extends GridPane {
     logger.info("RightClick triggered on main GameBoard...");
     if (rightClickedListener != null) {
       rightClickedListener.rightClicked(rightClick);
+    }
+  }
+
+  private void hoverBlock(GameBlock block) {
+    if (currentBlock != null) {
+      unhover(currentBlock);
+    }
+    currentBlock = block;
+    currentBlock.setIsHover(true);
+  }
+
+  private void unhover(GameBlock block) {
+    block.setIsHover(false);
+  }
+
+  public void upClicked() {
+    if (currentBlock == null) {
+      currentBlock = blocks[0][0];
+      hoverBlock(currentBlock);
+    } else if (currentBlock.getY() == 0) {
+      currentBlock = blocks[currentBlock.getX()][0];
+      hoverBlock(currentBlock);
+    } else {
+      unhover(currentBlock);
+      currentBlock = blocks[currentBlock.getX()][currentBlock.getY() - 1];
+      hoverBlock(currentBlock);
+    }
+  }
+
+  public void downClicked() {
+    if (currentBlock == null) {
+      currentBlock = blocks[0][0];
+      hoverBlock(currentBlock);
+    } else if (currentBlock.getY() == 4) {
+      currentBlock = blocks[currentBlock.getX()][4];
+      hoverBlock(currentBlock);
+    } else {
+      unhover(currentBlock);
+      currentBlock = blocks[currentBlock.getX()][currentBlock.getY() + 1];
+      hoverBlock(currentBlock);
+    }
+  }
+
+  public void rightArrowClicked() {
+    if (currentBlock == null) {
+      currentBlock = blocks[0][0];
+      hoverBlock(currentBlock);
+    } else if (currentBlock.getX() == 4) {
+      currentBlock = blocks[4][currentBlock.getY()];
+      hoverBlock(currentBlock);
+    } else {
+      unhover(currentBlock);
+      currentBlock = blocks[currentBlock.getX() + 1][currentBlock.getY()];
+      hoverBlock(currentBlock);
+    }
+  }
+
+  public void leftArrowClicked() {
+    if (currentBlock == null) {
+      currentBlock = blocks[0][0];
+      hoverBlock(currentBlock);
+    } else if (currentBlock.getX() == 0) {
+      currentBlock = blocks[0][currentBlock.getY()];
+      hoverBlock(currentBlock);
+    } else {
+      unhover(currentBlock);
+      currentBlock = blocks[currentBlock.getX() - 1][currentBlock.getY()];
+      hoverBlock(currentBlock);
+    }
+  }
+
+  public void playPiece(GamePiece piece) {
+    grid.playPiece(currentBlock.getX(), currentBlock.getY(), piece);
+  }
+
+  public void fadeOut(HashSet<GameBlockCoordinate> blocks) {
+    for (GameBlockCoordinate block : blocks) {
+      this.blocks[block.getX()][block.getY()].fadeOut();
     }
   }
 

@@ -96,7 +96,7 @@ public class PieceBoard extends GameBoard {
     logger.info("Block clicked: {}", block);
 
     if(pieceClickedListener != null) {
-      pieceClickedListener.blockClicked(block);
+      pieceClickedListener.blockClicked(block, event);
     }
   }
 
