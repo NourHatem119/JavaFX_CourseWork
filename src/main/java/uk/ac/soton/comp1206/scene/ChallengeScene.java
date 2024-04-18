@@ -290,8 +290,8 @@ public class ChallengeScene extends BaseScene {
 
   private void gameOver(Game currentGame) {
     multimedia.stopMusic();
-    gameWindow.startScoresScene();
     multimedia.playAudio(gameOverEffect);
+    gameWindow.startScoresScene(game);
   }
 
 }
