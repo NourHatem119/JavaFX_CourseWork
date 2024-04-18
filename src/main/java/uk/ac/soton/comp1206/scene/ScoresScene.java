@@ -23,21 +23,28 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
-import javafx.util.StringConverter;
-import javafx.util.converter.IntegerStringConverter;
-import javafx.util.converter.NumberStringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.ui.ScoresList;
 
 public class ScoresScene extends BaseScene {
 
   BorderPane mainPane = new BorderPane();
 
+  ArrayList<Pair<String, Integer>> scores = loadScores(new File("D:\\Uni\\"
+      + "Programming_II\\Coursework\\coursework\\scores.txt"));
+
+  public SimpleListProperty<Pair<String, Integer>> localScores =
+      new SimpleListProperty<>(FXCollections.observableArrayList(scores));
+
   Game game;
+
+  ScoresList scoresList;
 
   int newScore;
 
@@ -66,16 +73,17 @@ public class ScoresScene extends BaseScene {
     scoresPane.getStyleClass().add("menu-background");
     root.getChildren().add(scoresPane);
 
+    scoresList = new ScoresList(this);
+    //TODO Fix that the scores not showing up
+    scoresList.reveal(mainPane);
     mainPane = new BorderPane();
     scoresPane.getChildren().add(mainPane);
   }
 
-  private void reveal() {
-  }
 
-  private ArrayList<Pair<SimpleStringProperty, SimpleIntegerProperty>> loadScores(File scoresFile) {
+  private ArrayList<Pair<String, Integer>> loadScores(File scoresFile) {
     BufferedReader reader;
-    ArrayList<Pair<SimpleStringProperty, SimpleIntegerProperty>> scores =
+    ArrayList<Pair<String , Integer>> scores =
         new ArrayList<>();
     try {
       FileReader fileReader = new FileReader(scoresFile);
@@ -84,8 +92,8 @@ public class ScoresScene extends BaseScene {
 //      int index = 0;
       while ((line = reader.readLine()) != null) {
         String[] score = line.split(":");
-        scores.add(new Pair<>(new SimpleStringProperty(score[0]),
-            new SimpleIntegerProperty(Integer.parseInt(score[1]))));
+        scores.add(new Pair<>(score[0],
+            Integer.parseInt(score[1])));
 //        index ++;
       }
     } catch (FileNotFoundException e) {
