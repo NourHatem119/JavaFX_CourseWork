@@ -63,11 +63,9 @@ public class LobbyScene extends BaseScene {
 
   @Override
   public void initialise() {
-    communicator.addListener(e -> {
-      Platform.runLater(() -> {
-        handle(e);
-      });
-    });
+    communicator.addListener(message ->
+        Platform.runLater(() ->
+            handle(message)));
     createTimer();
   }
 
@@ -89,6 +87,7 @@ public class LobbyScene extends BaseScene {
     startGame = new Button("Start");
     leaveChannel = new Button("Leave");
     startGame.setOnAction(e -> {
+      communicator.send("START");
       gameWindow.startMultiplayer();
       timer.cancel();
       timer.purge();
@@ -128,7 +127,7 @@ public class LobbyScene extends BaseScene {
         communicator.send("LIST");
       }
     };
-    timer.schedule(requestChannels, 100, 500);
+    timer.schedule(requestChannels, 50, 1000);
   }
 
   private void showChannelChat(String nameOfChannel) {

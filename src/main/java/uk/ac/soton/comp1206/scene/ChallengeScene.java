@@ -46,10 +46,10 @@ public class ChallengeScene extends BaseScene {
   PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4, gameWindow.getHeight() / 4);
   GameBoard board;
   Rectangle timeBar;
-  private final Multimedia multimedia = new Multimedia();
+  protected final Multimedia multimedia = new Multimedia();
   private final String path = "d:\\Uni\\Programming_II\\Coursework\\coursework\\src\\main"
       + "\\resources";
-  private final Media music = new Media(new File(path + "\\music\\game.wav").toURI().toString());
+  protected final Media music = new Media(new File(path + "\\music\\game.wav").toURI().toString());
   private final Media rotateEffect =
       new Media(new File(path + "\\sounds\\rotate.wav").toURI().toString());
   private final Media placeEffect =
@@ -143,7 +143,7 @@ public class ChallengeScene extends BaseScene {
     game.setOnGameOver(this::gameOver);
   }
 
-  private void gameLoop(int i) {
+  protected void gameLoop(int i) {
     logger.info("GameLoop Started...");
     Timeline timePass = new Timeline(
         new KeyFrame(Duration.ZERO, new KeyValue(timeBar.widthProperty(), gameWindow.getWidth())),
@@ -166,7 +166,7 @@ public class ChallengeScene extends BaseScene {
 
   }
 
-  private void rightClicked(MouseEvent event) {
+  protected void rightClicked(MouseEvent event) {
     if (event.getButton().equals(MouseButton.SECONDARY)) {
       rotateCurrentPiece(game.getCurrentPiece(), "right");
       currentPieceShow.showPiece(game.getCurrentPiece());
@@ -179,7 +179,7 @@ public class ChallengeScene extends BaseScene {
    * @param gameBlock The Game Block that was clocked
    * @param event The mouse event that has occurred
    */
-  private void blockClicked(GameBlock gameBlock, MouseEvent event) {
+  protected void blockClicked(GameBlock gameBlock, MouseEvent event) {
     boolean canPlay;
     if (event.getButton().equals(MouseButton.PRIMARY)) {
       canPlay = game.blockClicked(gameBlock);
@@ -201,7 +201,7 @@ public class ChallengeScene extends BaseScene {
    * @param block the Game Block that was clocked
    * @param event The mouse event that has occurred
    */
-  private void pieceClicked(GameBlock block, MouseEvent event) {
+  protected void pieceClicked(GameBlock block, MouseEvent event) {
     boolean isCurrentPiece = ((PieceBoard) block.getGameBoard()).isCurrentPiece();
     if (isCurrentPiece) {
       logger.info("Current Piece Clicked...");
@@ -249,13 +249,13 @@ public class ChallengeScene extends BaseScene {
     } else if (keyClicked.getCode().equals(KeyCode.E) || keyClicked.getCode().equals(KeyCode.C)) {
       rotateCurrentPiece(game.getCurrentPiece(), "right");
       currentPieceShow.showPiece(game.getCurrentPiece());
-    } else if (keyClicked.getCode().equals(KeyCode.UP)) {
+    } else if (keyClicked.getCode().equals(KeyCode.UP) || keyClicked.getCode().equals(KeyCode.W)) {
       board.upClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.DOWN)) {
+    } else if (keyClicked.getCode().equals(KeyCode.DOWN) || keyClicked.getCode().equals(KeyCode.S)) {
       board.downClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.RIGHT)) {
+    } else if (keyClicked.getCode().equals(KeyCode.RIGHT) || keyClicked.getCode().equals(KeyCode.D)) {
       board.rightArrowClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.LEFT)) {
+    } else if (keyClicked.getCode().equals(KeyCode.LEFT) || keyClicked.getCode().equals(KeyCode.A)) {
       board.leftArrowClicked();
     } else if (keyClicked.getCode().equals(KeyCode.ENTER) || keyClicked.getCode()
         .equals(KeyCode.X)) {
@@ -273,7 +273,7 @@ public class ChallengeScene extends BaseScene {
     nextPieceShow.showPiece(game.getNextPiece());
   }
 
-  private void nextPiece(GamePiece currentPiece, GamePiece nextPiece) {
+  protected void nextPiece(GamePiece currentPiece, GamePiece nextPiece) {
     currentPieceShow.showPiece(currentPiece);
     nextPieceShow.showPiece(nextPiece);
   }
@@ -285,13 +285,13 @@ public class ChallengeScene extends BaseScene {
     currentPieceShow.showPiece(currentPiece);
   }
 
-  private void lineCleared(HashSet<GameBlockCoordinate> blocks) {
+  protected void lineCleared(HashSet<GameBlockCoordinate> blocks) {
     multimedia.playAudio(lineClearEffect);
     logger.info("Blocks Coordinates {}", blocks);
     board.fadeOut(blocks);
   }
 
-  private void gameOver(Game currentGame) {
+  protected void gameOver(Game currentGame) {
     multimedia.stopMusic();
     multimedia.playAudio(gameOverEffect);
     gameWindow.startScoresScene(game);

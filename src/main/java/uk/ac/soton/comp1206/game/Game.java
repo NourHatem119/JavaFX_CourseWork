@@ -1,7 +1,6 @@
 package uk.ac.soton.comp1206.game;
 
 
-
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Timer;
@@ -19,11 +18,11 @@ import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.GameOverListener;
 import uk.ac.soton.comp1206.event.LineClearedListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
-import uk.ac.soton.comp1206.scene.ChallengeScene;
 
 /**
- * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
- * and to handle actions made by the player should take place inside this class.
+ * The Game class handles the main logic, state and properties of the TetrECS game. Methods to
+ * manipulate the game state and to handle actions made by the player should take place inside this
+ * class.
  */
 public class Game {
 
@@ -52,13 +51,13 @@ public class Game {
     return currentPiece;
   }
 
-  protected GamePiece currentPiece ;
+  protected GamePiece currentPiece;
 
   public GamePiece getNextPiece() {
     return nextPiece;
   }
 
-  protected GamePiece nextPiece ;
+  protected GamePiece nextPiece;
   public NextPieceListener nextPieceListener;
 
   public LineClearedListener lineClearedListener;
@@ -120,89 +119,94 @@ public class Game {
   private final IntegerProperty lives = new SimpleIntegerProperty(3);
   private final IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
-    /**
-     * Create a new game with the specified rows and columns. Creates a corresponding grid model.
-     * @param cols number of columns
-     * @param rows number of rows
-     */
-    public Game(int cols, int rows) {
-        this.cols = cols;
-        this.rows = rows;
+  /**
+   * Create a new game with the specified rows and columns. Creates a corresponding grid model.
+   *
+   * @param cols number of columns
+   * @param rows number of rows
+   */
+  public Game(int cols, int rows) {
+    this.cols = cols;
+    this.rows = rows;
 
-        //Create a new grid model to represent the game state
-        this.grid = new Grid(cols,rows);
-        this.executor = Executors.newSingleThreadScheduledExecutor();
+    //Create a new grid model to represent the game state
+    this.grid = new Grid(cols, rows);
+    this.executor = Executors.newSingleThreadScheduledExecutor();
+  }
+
+  /**
+   * Start the game
+   */
+  public void start() {
+    logger.info("Starting game");
+    initialiseGame();
+  }
+
+  /**
+   * Initialise a new game and set up anything that needs to be done at the start
+   */
+  public void initialiseGame() {
+    logger.info("Initialising game");
+    currentPiece = spawnPiece();
+    nextPiece = spawnPiece();
+    createTimer();
+  }
+
+  /**
+   * Handle what should happen when a particular block is clicked
+   *
+   * @param gameBlock the block that was clicked
+   */
+  public boolean blockClicked(GameBlock gameBlock) {
+    //Get the position of this block
+    int x = gameBlock.getX();
+    int y = gameBlock.getY();
+
+    if (grid.canPlayPiece(x, y, currentPiece)) {
+      grid.playPiece(x, y, currentPiece);
+      restartTimer();
+      afterPiece();
+      nextPiece();
+      return true;
+    } else {
+      return false;
     }
+  }
 
-    /**
-     * Start the game
-     */
-    public void start() {
-        logger.info("Starting game");
-        initialiseGame();
-    }
+  /**
+   * Get the grid model inside this game representing the game state of the board
+   *
+   * @return game grid model
+   */
+  public Grid getGrid() {
+    return grid;
+  }
 
-    /**
-     * Initialise a new game and set up anything that needs to be done at the start
-     */
-    public void initialiseGame() {
-        logger.info("Initialising game");
-        currentPiece = spawnPiece();
-        nextPiece = spawnPiece();
-        createTimer();
-    }
+  /**
+   * Get the number of columns in this game
+   *
+   * @return number of columns
+   */
+  public int getCols() {
+    return cols;
+  }
 
-    /**
-     * Handle what should happen when a particular block is clicked
-     * @param gameBlock the block that was clicked
-     */
-    public boolean blockClicked(GameBlock gameBlock) {
-        //Get the position of this block
-        int x = gameBlock.getX();
-        int y = gameBlock.getY();
-
-
-      if(grid.canPlayPiece(x,y,currentPiece)) {
-        grid.playPiece(x, y, currentPiece);
-        restartTimer();
-        afterPiece();
-        nextPiece();
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    /**
-     * Get the grid model inside this game representing the game state of the board
-     * @return game grid model
-     */
-    public Grid getGrid() {
-        return grid;
-    }
-
-    /**
-     * Get the number of columns in this game
-     * @return number of columns
-     */
-    public int getCols() {
-        return cols;
-    }
-
-    /**
-     * Get the number of rows in this game
-     * @return number of rows
-     */
-    public int getRows() {
-        return rows;
-    }
+  /**
+   * Get the number of rows in this game
+   *
+   * @return number of rows
+   */
+  public int getRows() {
+    return rows;
+  }
 
   public GamePiece spawnPiece() {
     logger.info("Spawning a new Piece...");
     Random rand = new Random();
     return GamePiece.createPiece(rand.nextInt(GamePiece.PIECES));
   }
-  private void nextPiece() {
+
+  protected void nextPiece() {
     currentPiece = nextPiece;
     nextPiece = spawnPiece();
     if (nextPieceListener != null) {
@@ -210,6 +214,7 @@ public class Game {
     }
     logger.info("Current Piece: {}", currentPiece);
   }
+
   /**
    * Handles the logic after each adding a piece.
    */
@@ -217,16 +222,16 @@ public class Game {
     logger.info("Piece Placed, running afterPiece Procedures...");
     int linesCleared = 0;
     HashSet<GameBlockCoordinate> blocksToClear = new HashSet<>();
-    for (int col = 0; col < grid.getCols(); col++){
-      HashSet<GameBlockCoordinate> candidateBlocks=checkColFull(col);
-      if(!candidateBlocks.isEmpty()) {
+    for (int col = 0; col < grid.getCols(); col++) {
+      HashSet<GameBlockCoordinate> candidateBlocks = checkColFull(col);
+      if (!candidateBlocks.isEmpty()) {
         linesCleared++;
         blocksToClear.addAll(candidateBlocks);
       }
     }
-    for (int row = 0; row < grid.getRows(); row++){
+    for (int row = 0; row < grid.getRows(); row++) {
       HashSet<GameBlockCoordinate> candidateBlocks = checkRowFull(row);
-      if(!candidateBlocks.isEmpty()) {
+      if (!candidateBlocks.isEmpty()) {
         linesCleared++;
         blocksToClear.addAll(candidateBlocks);
       }
@@ -248,34 +253,36 @@ public class Game {
 
   /**
    * Checks if the given column is complete or not.
+   *
    * @param col The column to be checked
    * @return whether the column is full or not
    */
-  private HashSet<GameBlockCoordinate> checkColFull(int col){
+  private HashSet<GameBlockCoordinate> checkColFull(int col) {
     HashSet<GameBlockCoordinate> blocksToClear = new HashSet<>();
-    for (int i = 0; i < rows; i++){
-      if (grid.get(col, i) == 0){
+    for (int i = 0; i < rows; i++) {
+      if (grid.get(col, i) == 0) {
         blocksToClear.clear();
         break;
       }
-      blocksToClear.add(new GameBlockCoordinate(col,i));
+      blocksToClear.add(new GameBlockCoordinate(col, i));
     }
     return blocksToClear;
   }
+
   /**
    * Checks if the given row is complete or not.
    *
    * @param row The row to be checked
    * @return whether the row is full or not
    */
-  private HashSet<GameBlockCoordinate> checkRowFull(int row){
+  private HashSet<GameBlockCoordinate> checkRowFull(int row) {
     HashSet<GameBlockCoordinate> blocksToClear = new HashSet<>();
-    for (int i = 0; i < cols; i++){
-      if (grid.get(i, row) == 0){
+    for (int i = 0; i < cols; i++) {
+      if (grid.get(i, row) == 0) {
         blocksToClear.clear();
         break;
       }
-      blocksToClear.add(new GameBlockCoordinate(i,row));
+      blocksToClear.add(new GameBlockCoordinate(i, row));
     }
     return blocksToClear;
   }
@@ -285,10 +292,11 @@ public class Game {
   }
 
   protected void multiplier(int linesCleared) {
-    if (linesCleared > 0)
+    if (linesCleared > 0) {
       setMultiplier(getMultiplier() + 1);
-    else
+    } else {
       setMultiplier(1);
+    }
   }
 
   public void rotateCurrentPiece(String direction) {
@@ -331,7 +339,7 @@ public class Game {
     this.gameLoopListener = listener;
   }
 
-  public void gameLoop () {
+  public void gameLoop() {
     if (getLives() <= 0) {
       timer.cancel();
       if (gameOverListener != null) {
@@ -346,7 +354,7 @@ public class Game {
     }
   }
 
-  private void createTimer() {
+  protected void createTimer() {
     timer = new Timer();
     TimerTask task = new TimerTask() {
       @Override

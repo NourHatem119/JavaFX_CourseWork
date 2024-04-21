@@ -85,8 +85,9 @@ public class ScoresScene extends BaseScene {
     scoresPane.getStyleClass().add("menu-background");
     root.getChildren().add(scoresPane);
 
-    scoresList = new ScoresList(this, false);
-    onlineScoresList = new ScoresList(this, true);
+    scoresList = new ScoresList(false);
+    onlineScoresList = new ScoresList(true);
+    scoresList.listProperty().bind(localScores);
     remoteScores = FXCollections.observableArrayList(remoteScoresList);
     SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
     onlineScoresList.listProperty().bind(wrap);

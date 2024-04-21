@@ -19,25 +19,25 @@ public class ScoresList extends VBox {
   private static final Logger logger = LogManager.getLogger(ScoresList.class);
 
 
-  public SimpleListProperty<Pair<String,Integer>> scoresList = new SimpleListProperty<>();
-
-  ScoresScene scoresScene;
-
+  protected SimpleListProperty<Pair<String, Integer>> scoresList = new SimpleListProperty<>();
   Text identifier = new Text("Online");
 
-  public ScoresList(ScoresScene scoresScene, boolean online) {
-    this.scoresScene = scoresScene;
+  public ScoresList(boolean online) {
     if (!online) {
-      scoresList.bind(scoresScene.localScores);
       identifier.setText("Local");
     }
   }
 
+  public ScoresList() {
+
+  }
+
   public void reveal() {
+    getChildren().clear();
     identifier.getStyleClass().add("title");
     getChildren().add(identifier);
     int index = 0;
-    FadeTransition[] transitions = new FadeTransition[10];
+    FadeTransition[] transitions = new FadeTransition[scoresList.getSize()];
     for (Pair<String, Integer> singleScore : scoresList) {
       logger.info("Item Added {} : {}", singleScore.getKey(), singleScore.getValue());
       var score = new Text(singleScore.getKey() + ":" + singleScore.getValue().toString());
