@@ -69,9 +69,8 @@
 }
 
 .score {
-  -fx-fill: yellow;
   -fx-font-family: 'Orbitron';
-  -fx-font-size: 36px;
+  -fx-font-size: 25px;
   -fx-font-weight: 700;
   -fx-border-color: black;
   -fx-stroke: black;
@@ -129,6 +128,8 @@
 }
 
 .scoreitem {
+
+
 }
 
 .scorer {
@@ -217,4 +218,10 @@ TextField {
   -fx-font-size: 10px;
   -fx-font-family: 'Orbitron';
   -fx-fill: white;
+}
+
+.scrollchat {
+  -fx-background-color: rgba(00,00,00,0.25);
+  -fx-background: rgba(00,00,00,0.25);
+  -fx-border-color: white;
 }

@@ -8,7 +8,7 @@ import uk.ac.soton.comp1206.game.GamePiece;
 
 public class PieceBoard extends GameBoard {
 
-  private static final Logger logger = LogManager.getLogger(GameBoard.class);
+  private static final Logger logger = LogManager.getLogger(PieceBoard.class);
 
   BlockClickedListener pieceClickedListener;
 

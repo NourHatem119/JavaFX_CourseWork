@@ -197,7 +197,7 @@ public class Game {
         return rows;
     }
 
-  public static GamePiece spawnPiece() {
+  public GamePiece spawnPiece() {
     logger.info("Spawning a new Piece...");
     Random rand = new Random();
     return GamePiece.createPiece(rand.nextInt(GamePiece.PIECES));

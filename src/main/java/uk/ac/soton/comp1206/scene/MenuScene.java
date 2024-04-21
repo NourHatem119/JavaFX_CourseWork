@@ -9,7 +9,6 @@ import javafx.scene.media.Media;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ux.Multimedia;
@@ -68,6 +67,12 @@ public class MenuScene extends BaseScene {
         //Bind the button action to the startGame method in the menu
         play.setOnAction(this::startGame);
         instructions.setOnAction(this::startInstructions);
+        multiplayer.setOnAction(this::startLobby);
+    }
+
+    private void startLobby(ActionEvent event) {
+        music.stopMusic();
+        gameWindow.startLobby();
     }
 
     /**

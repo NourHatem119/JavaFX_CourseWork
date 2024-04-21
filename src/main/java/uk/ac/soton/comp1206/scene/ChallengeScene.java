@@ -30,6 +30,7 @@ import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.ui.ScoresList;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
@@ -38,7 +39,7 @@ import uk.ac.soton.comp1206.ux.Multimedia;
  */
 public class ChallengeScene extends BaseScene {
 
-  private static final Logger logger = LogManager.getLogger(MenuScene.class);
+  private static final Logger logger = LogManager.getLogger(ChallengeScene.class);
   protected Game game;
   PieceBoard currentPieceShow = new PieceBoard(gameWindow.getWidth() / 4,
       gameWindow.getHeight() / 4);
@@ -93,12 +94,13 @@ public class ChallengeScene extends BaseScene {
     var level = new Text();
     var lives = new Text();
     var multiplier = new Text();
+    var highScore = new Text("HighScore:\n" + getHighScore().toString());
     timeBar = new Rectangle();
     VBox bottomBar = new VBox(timeBar);
     timeBar.setFill(Color.LIMEGREEN);
     timeBar.setHeight(20.0);
     timeBar.setWidth(gameWindow.getWidth());
-    sideBar.getChildren().addAll(level, lives, multiplier);
+    sideBar.getChildren().addAll(highScore, level, lives, multiplier);
 
     // Bind the Score, Level, Lives, and Multiplier to their corresponding property.
     score.textProperty().bind(game.scoreProperty().asString("Score: %d"));
@@ -111,6 +113,7 @@ public class ChallengeScene extends BaseScene {
     level.getStyleClass().add("level");
     lives.getStyleClass().add("lives");
     multiplier.getStyleClass().add("multiplier");
+    highScore.getStyleClass().add("multiplier");
     //Set up and show the challengePane.
     challengePane.setMaxWidth(gameWindow.getWidth());
     challengePane.setMaxHeight(gameWindow.getHeight());
@@ -292,6 +295,10 @@ public class ChallengeScene extends BaseScene {
     multimedia.stopMusic();
     multimedia.playAudio(gameOverEffect);
     gameWindow.startScoresScene(game);
+  }
+
+  private Integer getHighScore() {
+    return ScoresScene.getHighScore();
   }
 
 }
