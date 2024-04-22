@@ -2,6 +2,8 @@ package uk.ac.soton.comp1206.game;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +18,7 @@ public class MultiplayerGame extends Game{
   Communicator communicator;
 
   Queue<GamePiece> pieces = new LinkedList<>();
+  Timer timer;
 
   @Override
   public void initialiseGame() {
@@ -31,6 +34,7 @@ public class MultiplayerGame extends Game{
   private void handlePiece(String piece) {
     piece = piece.replace("PIECE ", "");
     pieces.add(GamePiece.createPiece(Integer.parseInt(piece)));
+    logger.info("Piece Added ... {}", piece);
   }
 
   @Override
@@ -48,16 +52,15 @@ public class MultiplayerGame extends Game{
   public MultiplayerGame(int cols, int rows, Communicator communicator) {
     super(cols, rows);
     this.communicator = communicator;
-    communicator.addListener(message -> {
-      Platform.runLater(() -> {
-        if (message.startsWith("PIECE")) {
-          handlePiece(message);
-        }
-      });
-    });
-    for (int i = 0; i < 10; i++) {
-      communicator.send("PIECE");
-    }
+    this.communicator.addListener(message -> Platform.runLater(() -> {
+      if (message.startsWith("PIECE")) {
+        handlePiece(message);
+      }
+    }));
+    communicator.send("PIECE");
+    communicator.send("PIECE");
+    generatePieces();
+    //TODO Fix the listener not receiving
   }
 
   @Override
@@ -82,6 +85,17 @@ public class MultiplayerGame extends Game{
   protected void score(int numberOfLines, int numberOfBlocks) {
     super.score(numberOfLines, numberOfBlocks);
     communicator.send("SCORE " + getScore());
+  }
+
+  public void generatePieces() {
+    timer = new Timer();
+    TimerTask task = new TimerTask() {
+      @Override
+      public void run() {
+        communicator.send("PIECE");
+      }
+    };
+    timer.schedule(task, 0, 1000);
   }
 
 }

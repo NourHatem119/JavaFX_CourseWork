@@ -6,6 +6,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -88,9 +90,7 @@ public class LobbyScene extends BaseScene {
     leaveChannel = new Button("Leave");
     startGame.setOnAction(e -> {
       communicator.send("START");
-      gameWindow.startMultiplayer();
-      timer.cancel();
-      timer.purge();
+      startGame();
     });
     leaveChannel.setOnAction(e -> leaveChannel());
 
@@ -107,7 +107,7 @@ public class LobbyScene extends BaseScene {
       newChannelName.setOnKeyPressed(key -> {
         if (key.getCode().equals(KeyCode.ENTER)) {
           createChannel(newChannelName.getText());
-          joinChannel(newChannelName.getText());
+//          joinChannel(newChannelName.getText());
           showChannelChat(newChannelName.getText());
           leftPanel.getChildren().remove(newChannelName);
         }
@@ -177,6 +177,7 @@ public class LobbyScene extends BaseScene {
       if (e.getCode().equals(KeyCode.ENTER)) {
         if (chatBox.getText().toLowerCase().startsWith("/start") && host.get()) {
           communicator.send("START");
+          startGame();
         } else if (chatBox.getText().toLowerCase().startsWith("/part")) {
           leaveChannel();
         } else if (chatBox.getText().toLowerCase().startsWith("/nick")) {
@@ -200,7 +201,16 @@ public class LobbyScene extends BaseScene {
       handleMessages(message);
     } else if (message.contains("HOST")) {
       host.set(true);
+    } else if (message.startsWith("ERROR")) {
+      handleError(message);
     }
+  }
+
+  private void handleError(String message) {
+    Alert alert = new Alert(AlertType.ERROR);
+    alert.setTitle("Error");
+    alert.setContentText(message);
+    alert.showAndWait();
   }
 
   private void handleMessages(String s) {
@@ -247,5 +257,13 @@ public class LobbyScene extends BaseScene {
     leftPanel.getChildren().add(currentGames);
     leftPanel.getChildren().add(create);
     leftPanel.getChildren().add(channels);
+  }
+
+  protected void startGame() {
+//    communicator.send("START");
+    gameWindow.startMultiplayer();
+    timer.cancel();
+    timer.purge();
+    communicator.clearListeners();
   }
 }

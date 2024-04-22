@@ -43,11 +43,12 @@ public class ChallengeScene extends BaseScene {
   protected Game game;
   PieceBoard currentPieceShow = new PieceBoard(gameWindow.getWidth() / 4,
       gameWindow.getHeight() / 4);
-  PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4, gameWindow.getHeight() / 4);
+  PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4,
+      gameWindow.getHeight() / 4);
   GameBoard board;
   Rectangle timeBar;
   protected final Multimedia multimedia = new Multimedia();
-  private final String path = "d:\\Uni\\Programming_II\\Coursework\\coursework\\src\\main"
+  private final String path = "d:\\Uni\\P_II\\Coursework\\coursework\\src\\main"
       + "\\resources";
   protected final Media music = new Media(new File(path + "\\music\\game.wav").toURI().toString());
   private final Media rotateEffect =

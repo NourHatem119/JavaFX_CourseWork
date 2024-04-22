@@ -19,8 +19,8 @@ import uk.ac.soton.comp1206.ux.Multimedia;
 public class MenuScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
-    private Multimedia music = new Multimedia();
-    private Media backgroundMusic = new Media(new File("d:\\Uni\\Programming_II"
+    private final Multimedia music = new Multimedia();
+    private final Media backgroundMusic = new Media(new File("d:\\Uni\\P_II"
         + "\\Coursework\\coursework\\src\\main\\resources\\music\\menu.mp3").toURI().toString());
 
     /**
