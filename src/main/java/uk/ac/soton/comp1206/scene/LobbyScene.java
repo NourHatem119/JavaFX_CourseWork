@@ -127,7 +127,7 @@ public class LobbyScene extends BaseScene {
         communicator.send("LIST");
       }
     };
-    timer.schedule(requestChannels, 50, 1000);
+    timer.schedule(requestChannels, 0, 1000);
   }
 
   private void showChannelChat(String nameOfChannel) {
@@ -264,6 +264,5 @@ public class LobbyScene extends BaseScene {
     gameWindow.startMultiplayer();
     timer.cancel();
     timer.purge();
-    communicator.clearListeners();
   }
 }

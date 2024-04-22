@@ -19,16 +19,43 @@ public class MultiplayerGame extends Game{
 
   Queue<GamePiece> pieces = new LinkedList<>();
   Timer timer;
+  Runnable spawnThread=new Runnable() {
+    @Override
+    public void run() {
+      if(currentPiece==null){
+        currentPiece = spawnPiece();
+      }
+      if(nextPiece==null){
+        nextPiece = spawnPiece();
+      }
+
+      if(currentPiece==null||nextPiece==null){
+        Platform.runLater(spawnThread);
+      }
+      else  if (nextPieceListener != null) {
+        nextPieceListener.nextPiece(currentPiece, nextPiece);
+      }
+    }
+  };
 
   @Override
   public void initialiseGame() {
-    Platform.runLater(() -> {
-      currentPiece = spawnPiece();
-      nextPiece = spawnPiece();
-      if (nextPieceListener != null) {
-        nextPieceListener.nextPiece(currentPiece, nextPiece);
-      }
-    });
+    Platform.runLater(spawnThread);
+//    Platform.runLater(() -> {
+//      while(currentPiece==null ||nextPiece==null){
+//        currentPiece = spawnPiece();
+//        nextPiece = spawnPiece();
+//        try {
+//          Thread.sleep(100);
+//        } catch (InterruptedException e) {
+//          throw new RuntimeException(e);
+//        }
+//      }
+//
+//      if (nextPieceListener != null) {
+//        nextPieceListener.nextPiece(currentPiece, nextPiece);
+//      }
+//    });
   }
 
   private void handlePiece(String piece) {
@@ -53,14 +80,12 @@ public class MultiplayerGame extends Game{
     super(cols, rows);
     this.communicator = communicator;
     this.communicator.addListener(message -> Platform.runLater(() -> {
+      logger.info("listening on pieces {}", message);
       if (message.startsWith("PIECE")) {
         handlePiece(message);
       }
     }));
-    communicator.send("PIECE");
-    communicator.send("PIECE");
     generatePieces();
-    //TODO Fix the listener not receiving
   }
 
   @Override
@@ -92,10 +117,18 @@ public class MultiplayerGame extends Game{
     TimerTask task = new TimerTask() {
       @Override
       public void run() {
-        communicator.send("PIECE");
+        if (pieces.size() < 50) {
+          communicator.send("PIECE");
+        }
       }
     };
     timer.schedule(task, 0, 1000);
   }
 
+  @Override
+  public void endGame() {
+    super.endGame();
+    communicator.send("DIE");
+  }
 }
+

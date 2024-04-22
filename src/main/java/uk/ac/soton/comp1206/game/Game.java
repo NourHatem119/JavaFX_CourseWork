@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -44,8 +42,6 @@ public class Game {
   protected final Grid grid;
 
   private Timer timer;
-
-  private ScheduledExecutorService executor;
 
   public GamePiece getCurrentPiece() {
     return currentPiece;
@@ -131,7 +127,6 @@ public class Game {
 
     //Create a new grid model to represent the game state
     this.grid = new Grid(cols, rows);
-    this.executor = Executors.newSingleThreadScheduledExecutor();
   }
 
   /**
@@ -333,6 +328,7 @@ public class Game {
 
   public int getTimerDelay() {
     return Math.max(2500, 12000 - 500 * getLevel());
+//    return 2000;
   }
 
   public void setGameLoop(GameLoopListener listener) {
@@ -374,8 +370,10 @@ public class Game {
     createTimer();
   }
 
-  private void endGame() {
-    executor.shutdownNow();
+  public void endGame() {
+    logger.info("Game Finished...");
+    timer.cancel();
+    timer.purge();
   }
 
   public void setOnGameOver(GameOverListener listener) {

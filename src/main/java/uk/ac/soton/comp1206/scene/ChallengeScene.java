@@ -47,7 +47,7 @@ public class ChallengeScene extends BaseScene {
       gameWindow.getHeight() / 4);
   GameBoard board;
   Rectangle timeBar;
-  protected final Multimedia multimedia = new Multimedia();
+  protected static final Multimedia multimedia = new Multimedia();
   private final String path = "d:\\Uni\\P_II\\Coursework\\coursework\\src\\main"
       + "\\resources";
   protected final Media music = new Media(new File(path + "\\music\\game.wav").toURI().toString());
@@ -95,13 +95,17 @@ public class ChallengeScene extends BaseScene {
     var level = new Text();
     var lives = new Text();
     var multiplier = new Text();
-    var highScore = new Text("HighScore:\n" + getHighScore().toString());
+    Integer highScore = getHighScore();
+    Text highScoreBox = new Text("High Score: " + "10000");
+    if (highScore != null) {
+      highScoreBox = new Text("HighScore:\n" + highScore);
+    }
     timeBar = new Rectangle();
     VBox bottomBar = new VBox(timeBar);
     timeBar.setFill(Color.LIMEGREEN);
     timeBar.setHeight(20.0);
     timeBar.setWidth(gameWindow.getWidth());
-    sideBar.getChildren().addAll(highScore, level, lives, multiplier);
+    sideBar.getChildren().addAll(highScoreBox, level, lives, multiplier);
 
     // Bind the Score, Level, Lives, and Multiplier to their corresponding property.
     score.textProperty().bind(game.scoreProperty().asString("Score: %d"));
@@ -114,7 +118,7 @@ public class ChallengeScene extends BaseScene {
     level.getStyleClass().add("level");
     lives.getStyleClass().add("lives");
     multiplier.getStyleClass().add("multiplier");
-    highScore.getStyleClass().add("multiplier");
+    highScoreBox.getStyleClass().add("multiplier");
     //Set up and show the challengePane.
     challengePane.setMaxWidth(gameWindow.getWidth());
     challengePane.setMaxHeight(gameWindow.getHeight());
@@ -242,6 +246,7 @@ public class ChallengeScene extends BaseScene {
     if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
       multimedia.stopMusic();
       gameWindow.startMenu();
+      game.endGame();
     } else if (keyClicked.getCode().equals(KeyCode.R) || keyClicked.getCode()
         .equals(KeyCode.SPACE)) {
       swapPieces();

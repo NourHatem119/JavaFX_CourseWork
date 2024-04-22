@@ -18,7 +18,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
-import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
@@ -80,8 +79,8 @@ public class MultiPlayerScene extends ChallengeScene{
       for (int j = 0; j < players.size(); j++) {
         Pair<String, Integer> thePlayer = players.get(j);
         if (thePlayer.getKey().equals(playerInfo[0])) {
-          if (playerInfo[2].equals("DEAD"))
-            players.remove(j);
+          if (playerInfo[2].equals("DEAD") && !deadPlayers.contains(playerInfo[0]))
+            deadPlayers.add(playerInfo[0]);
           else
             players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
           found = true;
