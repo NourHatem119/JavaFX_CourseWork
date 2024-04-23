@@ -18,24 +18,21 @@ public class ScoresList extends VBox {
 
   private static final Logger logger = LogManager.getLogger(ScoresList.class);
 
-
-  protected SimpleListProperty<Pair<String, Integer>> scoresList = new SimpleListProperty<>();
-  Text identifier = new Text("Online");
-
-  public ScoresList(boolean online) {
-    if (!online) {
-      identifier.setText("Local");
-    }
-  }
-
   public ScoresList() {
+    this.getStyleClass().add("scorelist");
+    this.setSpacing(5);
 
+    scoresList = new SimpleListProperty<>(FXCollections.observableArrayList());
+    scoresList.addListener( (observable, oldValue, newValue) -> {
+      reveal();
+    });
   }
+
+
+  protected SimpleListProperty<Pair<String, Integer>> scoresList;
 
   public void reveal() {
     getChildren().clear();
-    identifier.getStyleClass().add("title");
-    getChildren().add(identifier);
     int index = 0;
     FadeTransition[] transitions = new FadeTransition[scoresList.getSize()];
     for (Pair<String, Integer> singleScore : scoresList) {

@@ -78,6 +78,8 @@ public class LobbyScene extends BaseScene {
     root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
     var lobbyPane = new BorderPane();
+    lobbyPane.setMaxWidth(gameWindow.getWidth());
+    lobbyPane.setMaxHeight(gameWindow.getHeight());
     lobbyPane.getStyleClass().add("menu-background");
     root.getChildren().add(lobbyPane);
 
@@ -203,7 +205,9 @@ public class LobbyScene extends BaseScene {
       host.set(true);
     } else if (message.startsWith("ERROR")) {
       handleError(message);
-    }
+    } else if (message.startsWith("START")) {
+      startGame();
+    };
   }
 
   private void handleError(String message) {

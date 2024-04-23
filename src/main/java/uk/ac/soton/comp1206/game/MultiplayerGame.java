@@ -19,20 +19,21 @@ public class MultiplayerGame extends Game{
 
   Queue<GamePiece> pieces = new LinkedList<>();
   Timer timer;
-  Runnable spawnThread=new Runnable() {
+  Runnable spawnThread = new Runnable() {
     @Override
     public void run() {
-      if(currentPiece==null){
+      //TODO Fix unmatched pieces
+      if (currentPiece == null) {
         currentPiece = spawnPiece();
       }
-      if(nextPiece==null){
+      if (currentPiece != null && nextPiece == null) {
         nextPiece = spawnPiece();
       }
 
-      if(currentPiece==null||nextPiece==null){
+      if (currentPiece == null || nextPiece == null) {
         Platform.runLater(spawnThread);
       }
-      else  if (nextPieceListener != null) {
+      else if (nextPieceListener != null) {
         nextPieceListener.nextPiece(currentPiece, nextPiece);
       }
     }
@@ -58,9 +59,10 @@ public class MultiplayerGame extends Game{
 //    });
   }
 
-  private void handlePiece(String piece) {
-    piece = piece.replace("PIECE ", "");
-    pieces.add(GamePiece.createPiece(Integer.parseInt(piece)));
+  private synchronized void handlePiece(String pieceNo) {
+    pieceNo = pieceNo.replace("PIECE ", "");
+    GamePiece piece = GamePiece.createPiece(Integer.parseInt(pieceNo.trim()));
+    pieces.add(piece);
     logger.info("Piece Added ... {}", piece);
   }
 
@@ -89,7 +91,7 @@ public class MultiplayerGame extends Game{
   }
 
   @Override
-  public GamePiece spawnPiece() {
+  public synchronized GamePiece spawnPiece() {
     communicator.send("PIECE");
     GamePiece piece = pieces.poll();
     logger.info("Spawning Piece  {}", piece);

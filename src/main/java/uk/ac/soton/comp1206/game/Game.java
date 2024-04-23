@@ -328,7 +328,7 @@ public class Game {
 
   public int getTimerDelay() {
     return Math.max(2500, 12000 - 500 * getLevel());
-//    return 2000;
+//    return 1000;
   }
 
   public void setGameLoop(GameLoopListener listener) {
@@ -366,14 +366,14 @@ public class Game {
 
   private void restartTimer() {
     timer.cancel();
-    timer.purge();
+//    timer.purge();
     createTimer();
   }
 
   public void endGame() {
     logger.info("Game Finished...");
     timer.cancel();
-    timer.purge();
+//    timer.purge();
   }
 
   public void setOnGameOver(GameOverListener listener) {

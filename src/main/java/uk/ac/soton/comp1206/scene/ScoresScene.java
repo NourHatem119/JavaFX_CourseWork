@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -46,16 +47,18 @@ public class ScoresScene extends BaseScene {
 
   Game game;
 
-  ScoresList scoresList;
+  ScoresList localScoresList;
+  ScoresList currentGameList;
   ScoresList onlineScoresList;
 
   int newScore;
 
-  public ScoresScene(GameWindow window, Game game) {
+  public ScoresScene(GameWindow window, Game game, ScoresList currentScores) {
     super(window);
     this.game = game;
     newScore = game.getScore();
     communicator = window.getCommunicator();
+    currentGameList = currentScores;
   }
 
   private static final Logger logger = LogManager.getLogger(ScoresScene.class);
@@ -82,41 +85,45 @@ public class ScoresScene extends BaseScene {
     scoresPane.getStyleClass().add("menu-background");
     root.getChildren().add(scoresPane);
 
-    scoresList = new ScoresList(false);
-    onlineScoresList = new ScoresList(true);
-    scoresList.listProperty().bind(localScores);
+    localScoresList = new ScoresList();
+    onlineScoresList = new ScoresList();
+    localScoresList.listProperty().bind(localScores);
     remoteScores = FXCollections.observableArrayList(remoteScoresList);
     SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
     onlineScoresList.listProperty().bind(wrap);
 
-    scoresList.setAlignment(Pos.CENTER);
+    HBox scoresBox = new HBox();
+    scoresBox.setSpacing(10);
+
+    localScoresList.setAlignment(Pos.CENTER);
     onlineScoresList.setAlignment(Pos.CENTER);
 
     mainPane = new BorderPane();
 
     int highScoreIndexLocal = highScoreIndexLocal();
-    int highScoreIndexRemote = highScoreIndexRemote();
 
-    if (highScoreIndexLocal != -1) {
-      HBox addLocalHighScore = getNewLocalHighScore(highScoreIndexLocal);
-      mainPane.setBottom(addLocalHighScore);
-      addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {
-        mainPane.getChildren().remove(addLocalHighScore);
-      });
+    if (currentGameList == null) {
+      if (highScoreIndexLocal != -1) {
+        VBox addLocalHighScore = getNewLocalHighScore(highScoreIndexLocal);
+        mainPane.setCenter(addLocalHighScore);
+        addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {
+          mainPane.getChildren().remove(addLocalHighScore);
+        });
+      }
+      scoresBox.getChildren().add(localScoresList);
     } else {
-      scoresList.reveal();
-      onlineScoresList.reveal();
+      scoresBox.getChildren().add(currentGameList);
     }
 
     var title = new Text("HIGHSCORES");
     title.getStyleClass().add("bigtitle");
     mainPane.setTop(title);
-    mainPane.setLeft(scoresList);
-    mainPane.setRight(onlineScoresList);
+    scoresBox.getChildren().add(onlineScoresList);
+    mainPane.setCenter(scoresBox);
     scoresPane.getChildren().add(mainPane);
   }
 
-  private HBox getNewLocalHighScore(int highScoreIndexLocal) {
+  private VBox getNewLocalHighScore(int highScoreIndexLocal) {
     var nameForNewScore = new TextField();
     nameForNewScore.setPromptText("Enter Name");
     nameForNewScore.setPrefWidth(50);
@@ -124,13 +131,14 @@ public class ScoresScene extends BaseScene {
     submitLocalScore.setOnMousePressed(e -> {
       if (localScores.size() < 9) {
         localScores.add(new Pair<>(nameForNewScore.getText(), newScore));
-      } else localScores.set(highScoreIndexLocal, new Pair<>(nameForNewScore.getText(),
-          newScore));
-      scoresList.reveal();
-      onlineScoresList.reveal();
+      } else {
+        localScores.add(highScoreIndexLocal, new Pair<>(nameForNewScore.getText(),
+            newScore));
+        localScores.remove(localScores.size() - 1);
+      }
       writeScores(new File("scores.txt"));
     });
-    return new HBox(nameForNewScore, submitLocalScore);
+    return new VBox(nameForNewScore, submitLocalScore);
   }
 
   private int highScoreIndexLocal() {
@@ -143,29 +151,27 @@ public class ScoresScene extends BaseScene {
   }
 
 
-  private int highScoreIndexRemote() {
-    for (int i = 0; i < remoteScores.size(); i++) {
-      if (newScore > remoteScores.get(i).getValue()) {
-        return i;
+  private static ArrayList<Pair<String, Integer>> loadScores(File file) {
+    if (!file.exists()) {
+      try {
+        boolean created = file.createNewFile();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        for (int i = 0; i < 10; i++) {
+          writer.write("NourEldin:" + i * 1000 + "\n");
+        }
+        writer.close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
     }
-    return -1;
-  }
-
-
-  private static ArrayList<Pair<String, Integer>> loadScores(File scoresFile) {
-
-    BufferedReader reader;
     ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
-    try {
-      FileReader fileReader = new FileReader(scoresFile);
-      reader = new BufferedReader(fileReader);
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String line;
-        while ((line = reader.readLine()) != null) {
-          String[] score = line.split(":");
-          scores.add(new Pair<>(score[0],
-              Integer.parseInt(score[1])));
-        }
+      while ((line = reader.readLine()) != null) {
+        String[] score = line.split(":");
+        scores.add(new Pair<>(score[0],
+            Integer.parseInt(score[1])));
+      }
 
       scores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
     } catch (FileNotFoundException e) {
@@ -183,9 +189,9 @@ public class ScoresScene extends BaseScene {
   private void receiveHighScores(String s) {
     String[] message = s.split(" ", 2);
     String receivedScores = "";
-      if (message[1].length() > 1) {
-        receivedScores = message[1];
-      }
+    if (message[1].length() > 1) {
+      receivedScores = message[1];
+    }
 
     String[] scores = receivedScores.split("\n");
     for (String sc : scores) {
@@ -198,13 +204,9 @@ public class ScoresScene extends BaseScene {
   }
 
   private void writeScores(File file) {
-    BufferedWriter writer;
-
-    try {
-      FileWriter fileWriter = new FileWriter(file);
-      writer = new BufferedWriter(fileWriter);
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
       for (Pair<String, Integer> pair : localScores) {
-        writer.write(pair.getKey() + ":" + pair.getValue().toString());
+        writer.write(pair.getKey() + ":" + pair.getValue().toString() + "\n");
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -217,10 +219,11 @@ public class ScoresScene extends BaseScene {
 
 
   public static Integer getHighScore() {
-    if(!scoresFile.exists()){
-      //Create it
+    ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
+    if (!scores.isEmpty()) {
+      return scores.get(0).getValue();
+    } else {
+      return null;
     }
-      return (loadScores(scoresFile)).get(0).getValue();
-
   }
 }

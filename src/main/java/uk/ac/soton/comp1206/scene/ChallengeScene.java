@@ -28,6 +28,7 @@ import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
+import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
@@ -234,7 +235,7 @@ public class ChallengeScene extends BaseScene {
   public void initialise() {
     logger.info("Initialising Challenge");
     game.start();
-    multimedia.playBackGroundMusic(music);
+//    multimedia.playBackGroundMusic(music);
     scene.setOnKeyPressed(this::keyClicked);
     currentPieceShow.showPiece(game.getCurrentPiece());
     nextPieceShow.showPiece(game.getNextPiece());
@@ -244,7 +245,7 @@ public class ChallengeScene extends BaseScene {
   @Override
   protected void keyClicked(KeyEvent keyClicked) {
     if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
-      multimedia.stopMusic();
+//      multimedia.stopMusic();
       gameWindow.startMenu();
       game.endGame();
     } else if (keyClicked.getCode().equals(KeyCode.R) || keyClicked.getCode()
@@ -298,9 +299,10 @@ public class ChallengeScene extends BaseScene {
   }
 
   protected void gameOver(Game currentGame) {
-    multimedia.stopMusic();
+//    multimedia.stopMusic();
     multimedia.playAudio(gameOverEffect);
     gameWindow.startScoresScene(game);
+
   }
 
   private Integer getHighScore() {

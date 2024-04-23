@@ -33,6 +33,10 @@ public class MultiPlayerScene extends ChallengeScene{
 
   ScoresList currentScores;
 
+  public ScoresList getScores() {
+    return currentScores;
+  }
+
   /**
    * Create a new Single Player challenge scene
    *
@@ -58,53 +62,10 @@ public class MultiPlayerScene extends ChallengeScene{
     getCurrentScores();
   }
 
-  private void handleScores(String s) {
-    String[] message = s.split(" ", 2);
-    String receivedScores = "";
-    if (message[0].equals("SCORES")) {
-      if (message[1].length() > 1){
-        receivedScores = message[1];
-        logger.info("message: {}", receivedScores);
-      }
-    }
-
-    String[] playersUpdate = receivedScores.split("\\n");
-    logger.info("Players {}", playersUpdate);
-
-//    logger.info("Length {}", players[0].split(":").length);
-    for (String player : playersUpdate) {
-      String[] playerInfo = player.split(":");
-
-      boolean found = false;
-      for (int j = 0; j < players.size(); j++) {
-        Pair<String, Integer> thePlayer = players.get(j);
-        if (thePlayer.getKey().equals(playerInfo[0])) {
-          if (playerInfo[2].equals("DEAD") && !deadPlayers.contains(playerInfo[0]))
-            deadPlayers.add(playerInfo[0]);
-          else
-            players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
-          found = true;
-          break;
-        }
-      }
-      if (!found)
-        players.add(new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
-
-    }
-    this.players.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-    currentPlayers.clear();
-    currentPlayers.addAll(this.players);
-    logger.info("Players Size:{}",this.players.size());
-    this.currentScores.reveal();
-  }
-
-  private void getCurrentScores() {
-    communicator.send("SCORES");
-  }
 
   @Override
   public void build() {
-    logger.info("Building " + this.getClass().getName());
+    logger.info("Building {}", this.getClass().getName());
 
     setupGame();
 
@@ -179,5 +140,51 @@ public class MultiPlayerScene extends ChallengeScene{
   @Override
   protected void pieceClicked(GameBlock block, MouseEvent event) {
     super.pieceClicked(block, event);
+  }
+
+  private void getCurrentScores() {
+    communicator.send("SCORES");
+  }
+
+  private void handleScores(String s) {
+    String[] message = s.split(" ", 2);
+    String receivedScores = "";
+    if (message[0].equals("SCORES")) {
+      if (message[1].length() > 1){
+        receivedScores = message[1];
+        logger.info("message: {}", receivedScores);
+      }
+    }
+
+    String[] playersUpdate = receivedScores.split("\\n");
+    logger.info("Players {}", playersUpdate);
+
+//    logger.info("Length {}", players[0].split(":").length);
+    for (String player : playersUpdate) {
+      String[] playerInfo = player.split(":");
+
+      boolean found = false;
+      for (int j = 0; j < players.size(); j++) {
+        Pair<String, Integer> thePlayer = players.get(j);
+        if (thePlayer.getKey().equals(playerInfo[0])) {
+          if (playerInfo[2].equals("DEAD") && !deadPlayers.contains(playerInfo[0])) {
+            kill(playerInfo[0]);
+            currentScores.getChildren().get(j).getStyleClass().add("eliminated");
+          }
+          else
+            players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        players.add(new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
+
+    }
+    this.players.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+    currentPlayers.clear();
+    currentPlayers.addAll(this.players);
+    logger.info("Players Size:{}",this.players.size());
+    this.currentScores.reveal();
   }
 }
