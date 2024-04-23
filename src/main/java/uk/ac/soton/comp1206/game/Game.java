@@ -5,6 +5,12 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -42,6 +48,9 @@ public class Game {
   protected final Grid grid;
 
   private Timer timer;
+
+  private ScheduledExecutorService executor;
+  ScheduledFuture<?> futureTask;
 
   public GamePiece getCurrentPiece() {
     return currentPiece;
@@ -127,6 +136,7 @@ public class Game {
 
     //Create a new grid model to represent the game state
     this.grid = new Grid(cols, rows);
+    executor = Executors.newSingleThreadScheduledExecutor();
   }
 
   /**
@@ -328,7 +338,7 @@ public class Game {
 
   public int getTimerDelay() {
     return Math.max(2500, 12000 - 500 * getLevel());
-//    return 1000;
+//    return Integer.MAX_VALUE;
   }
 
   public void setGameLoop(GameLoopListener listener) {
@@ -337,7 +347,7 @@ public class Game {
 
   public void gameLoop() {
     if (getLives() <= 0) {
-      timer.cancel();
+      logger.info("end Game...");
       if (gameOverListener != null) {
         endGame();
         Platform.runLater(() -> gameOverListener.gameOver(this));
@@ -346,34 +356,38 @@ public class Game {
       setLives(getLives() - 1);
       nextPiece();
       setMultiplier(1);
-      createTimer();
+      restartTimer();
     }
   }
 
   protected void createTimer() {
-    timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        gameLoop();
-      }
-    };
-    timer.schedule(task, getTimerDelay());
+//    timer = new Timer();
+//    TimerTask task = new TimerTask() {
+//      @Override
+//      public void run() {
+//        gameLoop();
+//      }
+//    };
+//    timer.schedule(task, getTimerDelay());
+//    if (gameLoopListener != null) {
+//      gameLoopListener.gameLoop(getTimerDelay());
+//    }
+    futureTask = executor.schedule(this::gameLoop, getTimerDelay(), TimeUnit.MILLISECONDS);
     if (gameLoopListener != null) {
       gameLoopListener.gameLoop(getTimerDelay());
     }
   }
 
   private void restartTimer() {
-    timer.cancel();
-//    timer.purge();
+    if (futureTask != null) {
+      futureTask.cancel(true);
+    }
     createTimer();
   }
 
   public void endGame() {
     logger.info("Game Finished...");
-    timer.cancel();
-//    timer.purge();
+    executor.shutdownNow();
   }
 
   public void setOnGameOver(GameOverListener listener) {

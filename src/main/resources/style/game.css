@@ -69,8 +69,9 @@
 }
 
 .score {
+  -fx-fill: yellow;
   -fx-font-family: 'Orbitron';
-  -fx-font-size: 25px;
+  -fx-font-size: 32px;
   -fx-font-weight: 700;
   -fx-border-color: black;
   -fx-stroke: black;
@@ -92,7 +93,7 @@
 .multiplier {
   -fx-fill: White;
   -fx-font-family: 'Orbitron';
-  -fx-font-size: 36px;
+  -fx-font-size: 20px;
   -fx-font-weight: 700;
   -fx-border-color: black;
   -fx-stroke: black;

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
@@ -13,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
@@ -42,10 +45,10 @@ public class ChallengeScene extends BaseScene {
 
   private static final Logger logger = LogManager.getLogger(ChallengeScene.class);
   protected Game game;
-  PieceBoard currentPieceShow = new PieceBoard(gameWindow.getWidth() / 4,
-      gameWindow.getHeight() / 4);
-  PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4,
-      gameWindow.getHeight() / 4);
+  PieceBoard currentPieceShow = new PieceBoard(gameWindow.getWidth() / 4.0,
+      gameWindow.getHeight() / 4.0);
+  PieceBoard nextPieceShow = new PieceBoard(gameWindow.getWidth() / 4.0 - 40,
+      gameWindow.getHeight() / 4.0 - 40);
   GameBoard board;
   Rectangle timeBar;
   protected static final Multimedia multimedia = new Multimedia();
@@ -75,6 +78,77 @@ public class ChallengeScene extends BaseScene {
     super(gameWindow);
     logger.info("Creating Challenge Scene");
   }
+  protected  HBox buildTopBar(String title){
+    var scoreValue = new Text();
+    var scoreText = new Text("Score");
+    scoreText.getStyleClass().add("heading");
+    var scoreBox = new VBox(scoreText, scoreValue);
+
+    var livesValue = new Text();
+    var livesText = new Text("Lives");
+    livesText.getStyleClass().add("heading");
+    var livesBox = new VBox(livesText, livesValue);
+    livesBox.setAlignment(Pos.CENTER);
+
+
+    var titleTxt = new Text(title);
+    titleTxt.getStyleClass().add("title");
+
+    var topBar = new HBox();
+    topBar.setSpacing(180);
+    topBar.setPadding(new Insets(topBar.getPadding().getTop(), 20,
+        topBar.getPadding().getBottom(), 10));
+
+    topBar.getChildren().addAll(scoreBox, titleTxt, livesBox);
+    scoreValue.textProperty().bind(game.scoreProperty().asString());
+    livesValue.textProperty().bind(game.livesProperty().asString());
+    scoreValue.getStyleClass().add("score");
+    livesValue.getStyleClass().add("lives");
+    return topBar;
+  }
+
+  protected VBox buildSideBar(){
+    var highScoreText = new Text("HighScore");
+    highScoreText.getStyleClass().add("heading");
+    var highScoreBox = new VBox(highScoreText);
+    highScoreBox.setAlignment(Pos.CENTER);
+    Integer highScore = getHighScore();
+    logger.info("HighScore : {}", highScore);
+    var highScoreValue = new Text(highScore.toString());
+    highScoreValue.getStyleClass().add("score");
+    highScoreBox.getChildren().add(highScoreValue);
+
+    var levelValue = new Text();
+    var levelText = new Text("Level");
+    levelText.getStyleClass().add("heading");
+    var levelBox = new VBox(levelText, levelValue);
+    levelBox.setAlignment(Pos.CENTER);
+
+    var sideBar = new VBox();
+    sideBar.setAlignment(Pos.CENTER);
+    sideBar.setPadding(new Insets(sideBar.getPadding().getTop(), 10,
+        sideBar.getPadding().getBottom(), sideBar.getPadding().getLeft()));
+    sideBar.setSpacing(15);
+    sideBar.getChildren().addAll(highScoreBox, levelBox);
+
+    levelValue.textProperty().bind(game.levelProperty().asString());
+
+    levelValue.getStyleClass().add("level");
+    highScoreValue.getStyleClass().add("score");
+    currentPieceShow.setIsCurrentPiece(true);
+    sideBar.getChildren().addAll(currentPieceShow, nextPieceShow);
+
+    return sideBar;
+  }
+
+  VBox buildBottomBar() {
+    timeBar = new Rectangle();
+    VBox bottomBar = new VBox(timeBar);
+    timeBar.setFill(Color.LIMEGREEN);
+    timeBar.setHeight(20.0);
+    timeBar.setWidth(gameWindow.getWidth());
+    return bottomBar;
+  }
 
   /**
    * Build the Challenge window
@@ -87,39 +161,11 @@ public class ChallengeScene extends BaseScene {
 
     root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
-    //Set up the Level, Lives, and Multiplier & add them to the sidebar.
+    //Set up the Level and add it to the right, and set the score and lives and add them
+    // to the top bar with the title.
     var challengePane = new StackPane();
-    var sideBar = new VBox();
-    sideBar.setAlignment(Pos.CENTER);
-    var score = new Label();
-    score.setAlignment(Pos.TOP_LEFT);
-    var level = new Text();
-    var lives = new Text();
-    var multiplier = new Text();
-    Integer highScore = getHighScore();
-    Text highScoreBox = new Text("High Score: " + "10000");
-    if (highScore != null) {
-      highScoreBox = new Text("HighScore:\n" + highScore);
-    }
-    timeBar = new Rectangle();
-    VBox bottomBar = new VBox(timeBar);
-    timeBar.setFill(Color.LIMEGREEN);
-    timeBar.setHeight(20.0);
-    timeBar.setWidth(gameWindow.getWidth());
-    sideBar.getChildren().addAll(highScoreBox, level, lives, multiplier);
-
-    // Bind the Score, Level, Lives, and Multiplier to their corresponding property.
-    score.textProperty().bind(game.scoreProperty().asString("Score: %d"));
-    level.textProperty().bind(game.levelProperty().asString("Level: %d"));
-    lives.textProperty().bind(game.livesProperty().asString("Lives: %d"));
-    multiplier.textProperty().bind(game.multiplierProperty().asString("Multi: %d"));
-
+    // Bind the Score, Level, Lives to their corresponding property.
     //Change the styles of each component to its corresponding style.
-    score.getStyleClass().add("score");
-    level.getStyleClass().add("level");
-    lives.getStyleClass().add("lives");
-    multiplier.getStyleClass().add("multiplier");
-    highScoreBox.getStyleClass().add("multiplier");
     //Set up and show the challengePane.
     challengePane.setMaxWidth(gameWindow.getWidth());
     challengePane.setMaxHeight(gameWindow.getHeight());
@@ -129,14 +175,15 @@ public class ChallengeScene extends BaseScene {
     var mainPane = new BorderPane();
     challengePane.getChildren().add(mainPane);
 
-    //Set up the main GameBoard, add the main Gameboard and the sideBar.
-    board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2, gameWindow.getWidth() / 2);
-    currentPieceShow.setIsCurrentPiece(true);
-    sideBar.getChildren().addAll(currentPieceShow, nextPieceShow);
+    //Set up the main GameBoard, add the main Gameboard and the rightBar.
+    logger.info("Width: {}, Height: {}",gameWindow.getWidth() / 2, gameWindow.getHeight() / 2);
+    board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2,
+        gameWindow.getHeight() / 2);
+
     mainPane.setCenter(board);
-    mainPane.setRight(sideBar);
-    mainPane.setLeft(score);
-    mainPane.setBottom(bottomBar);
+    mainPane.setRight(buildSideBar());
+    mainPane.setBottom(buildBottomBar());
+    mainPane.setTop(buildTopBar("Challenge Mode"));
 
     //Handle block on gameboard grid being clicked
     board.setOnBlockClick(this::blockClicked);
@@ -246,8 +293,8 @@ public class ChallengeScene extends BaseScene {
   protected void keyClicked(KeyEvent keyClicked) {
     if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
 //      multimedia.stopMusic();
-      gameWindow.startMenu();
       game.endGame();
+      gameWindow.startMenu();
     } else if (keyClicked.getCode().equals(KeyCode.R) || keyClicked.getCode()
         .equals(KeyCode.SPACE)) {
       swapPieces();

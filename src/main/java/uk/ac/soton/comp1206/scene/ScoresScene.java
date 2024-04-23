@@ -9,17 +9,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,8 +98,6 @@ public class ScoresScene extends BaseScene {
     SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
     onlineScoresList.listProperty().bind(wrap);
 
-    HBox scoresBox = new HBox();
-    scoresBox.setSpacing(10);
 
     localScoresList.setAlignment(Pos.CENTER);
     onlineScoresList.setAlignment(Pos.CENTER);
@@ -102,7 +106,13 @@ public class ScoresScene extends BaseScene {
 
     int highScoreIndexLocal = highScoreIndexLocal();
 
+    VBox localOrGameScores = new VBox();
+    localOrGameScores.setAlignment(Pos.CENTER);
+
+
     if (currentGameList == null) {
+      localOrGameScores.getChildren().add(new Text("Local Scores"));
+      localOrGameScores.getChildren().add(localScoresList);
       if (highScoreIndexLocal != -1) {
         VBox addLocalHighScore = getNewLocalHighScore(highScoreIndexLocal);
         mainPane.setCenter(addLocalHighScore);
@@ -110,16 +120,30 @@ public class ScoresScene extends BaseScene {
           mainPane.getChildren().remove(addLocalHighScore);
         });
       }
-      scoresBox.getChildren().add(localScoresList);
     } else {
-      scoresBox.getChildren().add(currentGameList);
+      localOrGameScores.getChildren().add(new Text("This Game"));
+      localOrGameScores.getChildren().add(currentGameList);
     }
 
-    var title = new Text("HIGHSCORES");
-    title.getStyleClass().add("bigtitle");
-    mainPane.setTop(title);
-    scoresBox.getChildren().add(onlineScoresList);
-    mainPane.setCenter(scoresBox);
+
+    VBox onlineScoresBox = new VBox();
+    onlineScoresBox.getChildren().add(new Text("Online Scores"));
+    onlineScoresBox.getChildren().add(onlineScoresList);
+    onlineScoresBox.setAlignment(Pos.CENTER);
+    localOrGameScores.getChildren().get(0).getStyleClass().add("title");
+    onlineScoresBox.getChildren().get(0).getStyleClass().add("title");
+    HBox allScores = new HBox();
+    allScores.getChildren().addAll(localOrGameScores, onlineScoresBox);
+    allScores.setAlignment(Pos.CENTER);
+    allScores.setSpacing(20);
+    VBox scoresContainer = new VBox();
+    scoresContainer.setAlignment(Pos.CENTER);
+    Text gameoverText = new Text("GAMEOVER");
+    gameoverText.getStyleClass().add("bigtitle");
+    var highScoresText = new Text("HIGHSCORES");
+    highScoresText.getStyleClass().add("bigtitle");
+    scoresContainer.getChildren().addAll(gameoverText, highScoresText, allScores);
+    mainPane.setCenter(scoresContainer);
     scoresPane.getChildren().add(mainPane);
   }
 
@@ -223,7 +247,7 @@ public class ScoresScene extends BaseScene {
     if (!scores.isEmpty()) {
       return scores.get(0).getValue();
     } else {
-      return null;
+      return 10000;
     }
   }
 }

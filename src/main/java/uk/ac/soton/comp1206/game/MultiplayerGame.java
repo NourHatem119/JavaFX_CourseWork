@@ -17,17 +17,19 @@ public class MultiplayerGame extends Game{
 
   Communicator communicator;
 
-  Queue<GamePiece> pieces = new LinkedList<>();
+  final Queue<GamePiece> pieces = new LinkedList<>();
   Timer timer;
+  //Called in initialise to fetch the first 2 pieces and show them thread safe because linked
+  // lists are not thread safe
   Runnable spawnThread = new Runnable() {
     @Override
     public void run() {
-      //TODO Fix unmatched pieces
       if (currentPiece == null) {
         currentPiece = spawnPiece();
       }
       if (currentPiece != null && nextPiece == null) {
         nextPiece = spawnPiece();
+        logger.info("Spawn Thread {}", this);
       }
 
       if (currentPiece == null || nextPiece == null) {
@@ -59,11 +61,15 @@ public class MultiplayerGame extends Game{
 //    });
   }
 
-  private synchronized void handlePiece(String pieceNo) {
+  private  void handlePiece(String pieceNo) {
+    logger.info("Handle Piece {}", this);
     pieceNo = pieceNo.replace("PIECE ", "");
     GamePiece piece = GamePiece.createPiece(Integer.parseInt(pieceNo.trim()));
-    pieces.add(piece);
-    logger.info("Piece Added ... {}", piece);
+    synchronized (pieces){
+      pieces.add(piece);
+    }
+
+    logger.info("Piece Added ... {}/{}", piece, pieceNo);
   }
 
   @Override
@@ -81,6 +87,7 @@ public class MultiplayerGame extends Game{
   public MultiplayerGame(int cols, int rows, Communicator communicator) {
     super(cols, rows);
     this.communicator = communicator;
+    logger.info("Multiplayer Game Constructor {}", this);
     this.communicator.addListener(message -> Platform.runLater(() -> {
       logger.info("listening on pieces {}", message);
       if (message.startsWith("PIECE")) {
@@ -91,11 +98,16 @@ public class MultiplayerGame extends Game{
   }
 
   @Override
-  public synchronized GamePiece spawnPiece() {
-    communicator.send("PIECE");
-    GamePiece piece = pieces.poll();
-    logger.info("Spawning Piece  {}", piece);
-    return piece;
+  public GamePiece spawnPiece() {
+//    communicator.send("PIECE");
+    logger.info("Spawn Piece {}", this);
+    synchronized (pieces){
+      GamePiece piece = pieces.poll();
+      logger.info("Spawning Piece  {}", piece);
+      return piece;
+    }
+
+
   }
 
   @Override
@@ -119,12 +131,12 @@ public class MultiplayerGame extends Game{
     TimerTask task = new TimerTask() {
       @Override
       public void run() {
-        if (pieces.size() < 50) {
+        if (pieces.size() < 500) {
           communicator.send("PIECE");
         }
       }
     };
-    timer.schedule(task, 0, 1000);
+    timer.schedule(task, 0, 10);
   }
 
   @Override
