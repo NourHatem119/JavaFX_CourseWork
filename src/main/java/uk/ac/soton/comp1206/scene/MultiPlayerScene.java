@@ -6,16 +6,16 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
+import uk.ac.soton.comp1206.ux.Multimedia;
 
 public class MultiPlayerScene extends ChallengeScene {
 
@@ -39,14 +39,11 @@ public class MultiPlayerScene extends ChallengeScene {
   public MultiPlayerScene(GameWindow gameWindow) {
     super(gameWindow);
     communicator = gameWindow.getCommunicator();
-
   }
 
   @Override
   public void initialise() {
-//    multimedia.playBackGroundMusic(music);
-    scene.setOnKeyPressed(this::keyClicked);
-    game.start();
+    super.initialise();
     communicator.addListener(message ->
         Platform.runLater(() -> {
           if (message.startsWith("SCORES")) {
@@ -58,7 +55,6 @@ public class MultiPlayerScene extends ChallengeScene {
 
   @Override
   protected VBox buildSideBar() {
-//    return super.buildSideBar();
 
     currentScores = new ScoresList();
     currentPlayers = FXCollections.observableArrayList(players);
@@ -68,49 +64,15 @@ public class MultiPlayerScene extends ChallengeScene {
     currentPieceShow.setIsCurrentPiece(true);
     rightPanel.setAlignment(Pos.CENTER);
     rightPanel.setSpacing(15);
-    rightPanel.getChildren().addAll(currentScores, currentPieceShow, nextPieceShow);
+    Text versusText = new Text("Versus");
+    versusText.getStyleClass().add("title");
+    VBox versusBox = new VBox(versusText, currentScores);
+    currentScores.setAlignment(Pos.CENTER);
+    versusBox.setAlignment(Pos.CENTER);
+    rightPanel.getChildren().addAll(versusBox, currentPieceShow, nextPieceShow);
     return rightPanel;
   }
 
-//  @Override
-//  public void build() {
-//    logger.info("Building {}", this.getClass().getName());
-//
-//    setupGame();
-//
-//    root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
-//
-//    var multiplayerChallengePane = new StackPane();
-//    multiplayerChallengePane.setMaxWidth(gameWindow.getWidth());
-//    multiplayerChallengePane.setMaxHeight(gameWindow.getHeight());
-//    multiplayerChallengePane.getStyleClass().add("challenge-background");
-//    root.getChildren().add(multiplayerChallengePane);
-//
-//
-//
-//    logger.info("Width: {}, Height: {}",gameWindow.getWidth() / 2, gameWindow.getHeight() / 2);
-//    board = new GameBoard(game.getGrid(),gameWindow.getWidth() / 2,
-//        gameWindow.getHeight() / 2);
-//
-//
-//    var mainPane = new BorderPane();
-//
-//    multiplayerChallengePane.getChildren().add(mainPane);
-//    mainPane.setRight(buildSideBar());
-//    mainPane.setBottom(buildBottomBar());
-//    mainPane.setTop(buildTopBar("Multiplayer Match"));
-//    mainPane.setCenter(board);
-//
-//    board.setOnBlockClick(this::blockClicked);
-//    currentPieceShow.setOnPieceClick(this::pieceClicked);
-//    nextPieceShow.setOnPieceClick(this::pieceClicked);
-//    game.setOnNextPiece(this::nextPiece);
-//    board.setOnRightClicked(this::rightClicked);
-//    game.setOnLineCleared(this::lineCleared);
-//    game.setGameLoop(this::gameLoop);
-//    game.setOnGameOver(this::gameOver);
-//
-//  }
 
   public void kill(String player) {
     deadPlayers.add(player);
@@ -121,26 +83,6 @@ public class MultiPlayerScene extends ChallengeScene {
   public void setupGame() {
     logger.info("Starting Game");
     game = new MultiplayerGame(5, 5, communicator);
-  }
-
-  @Override
-  protected void gameLoop(int i) {
-    super.gameLoop(i);
-  }
-
-  @Override
-  protected void rightClicked(MouseEvent event) {
-    super.rightClicked(event);
-  }
-
-  @Override
-  protected void blockClicked(GameBlock gameBlock, MouseEvent event) {
-    super.blockClicked(gameBlock, event);
-  }
-
-  @Override
-  protected void pieceClicked(GameBlock block, MouseEvent event) {
-    super.pieceClicked(block, event);
   }
 
   private void getCurrentScores() {
@@ -171,6 +113,7 @@ public class MultiPlayerScene extends ChallengeScene {
           if (playerInfo[2].equals("DEAD") && !deadPlayers.contains(playerInfo[0])) {
             kill(playerInfo[0]);
             currentScores.getChildren().get(j).getStyleClass().add("eliminated");
+            //TODO Eliminate Players
           } else {
             players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
           }

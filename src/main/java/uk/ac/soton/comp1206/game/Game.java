@@ -22,6 +22,7 @@ import uk.ac.soton.comp1206.event.GameLoopListener;
 import uk.ac.soton.comp1206.event.GameOverListener;
 import uk.ac.soton.comp1206.event.LineClearedListener;
 import uk.ac.soton.comp1206.event.NextPieceListener;
+import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to
@@ -353,6 +354,7 @@ public class Game {
         Platform.runLater(() -> gameOverListener.gameOver(this));
       }
     } else {
+      Multimedia.playAudio(Multimedia.lifeLostEffect);
       setLives(getLives() - 1);
       nextPiece();
       setMultiplier(1);
@@ -361,17 +363,6 @@ public class Game {
   }
 
   protected void createTimer() {
-//    timer = new Timer();
-//    TimerTask task = new TimerTask() {
-//      @Override
-//      public void run() {
-//        gameLoop();
-//      }
-//    };
-//    timer.schedule(task, getTimerDelay());
-//    if (gameLoopListener != null) {
-//      gameLoopListener.gameLoop(getTimerDelay());
-//    }
     futureTask = executor.schedule(this::gameLoop, getTimerDelay(), TimeUnit.MILLISECONDS);
     if (gameLoopListener != null) {
       gameLoopListener.gameLoop(getTimerDelay());

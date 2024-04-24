@@ -6,6 +6,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
  * A Base Scene used in the game. Handles common functionality between all scenes.
@@ -57,6 +58,7 @@ public abstract class BaseScene {
 
     protected void keyClicked (KeyEvent keyClicked) {
         if (keyClicked.getCode().equals(KeyCode.ESCAPE)){
+            Multimedia.stopMusic();
             gameWindow.startMenu();
         }
     }

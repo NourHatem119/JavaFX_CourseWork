@@ -1,11 +1,9 @@
 package uk.ac.soton.comp1206.scene;
 
-import java.io.File;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
-import javafx.scene.media.Media;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,13 +13,13 @@ import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
  * The main menu of the game. Provides a gateway to the rest of the game.
+ * TODO add Menu Animations and Visual Effects
  */
 public class MenuScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
     private final Multimedia music = new Multimedia();
-    private final Media backgroundMusic = new Media(new File("d:\\Uni\\P_II"
-        + "\\Coursework\\coursework\\src\\main\\resources\\music\\menu.mp3").toURI().toString());
+
 
     /**
      * Create a new menu scene
@@ -59,7 +57,7 @@ public class MenuScene extends BaseScene {
         var play = new Button("Play");
         var multiplayer = new Button("Multiplayer");
         var instructions = new Button("How To Play");
-        var exit = new Button("Exit");
+        var exit = new Button("Exit"); //TODO listen and exit game, using button and escape
         var buttons = new VBox(play, multiplayer, instructions, exit);
         buttons.setAlignment(Pos.CENTER);
         mainPane.setCenter(buttons);
@@ -71,7 +69,6 @@ public class MenuScene extends BaseScene {
     }
 
     private void startLobby(ActionEvent event) {
-        music.stopMusic();
         gameWindow.startLobby();
     }
 
@@ -81,7 +78,7 @@ public class MenuScene extends BaseScene {
     @Override
     public void initialise() {
         logger.info("Initialising Menu Scene...");
-        music.playBackGroundMusic(backgroundMusic);
+        Multimedia.playBackGroundMusic(Multimedia.menuMusic);
     }
 
     /**

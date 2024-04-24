@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
  * Displays an empty square (when the value is 0) or a coloured square depending on value.
  * <p>
  * The GameBlock value should be bound to a corresponding block in the Grid model.
+ * TODO Add Custom Squares
  */
 public class GameBlock extends Canvas {
 

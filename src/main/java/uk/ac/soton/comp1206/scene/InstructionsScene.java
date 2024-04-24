@@ -13,6 +13,7 @@ import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.ux.Multimedia;
 
 public class InstructionsScene extends BaseScene{
 
@@ -30,6 +31,7 @@ public class InstructionsScene extends BaseScene{
   @Override
   public void initialise() {
     logger.info("Initialising the Instructions Scene");
+    Multimedia.playBackGroundMusic(Multimedia.menuMusic);
     scene.setOnKeyPressed(this::keyClicked);
   }
 

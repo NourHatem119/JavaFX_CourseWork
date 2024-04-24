@@ -19,7 +19,7 @@ public class MultiplayerGame extends Game{
 
   final Queue<GamePiece> pieces = new LinkedList<>();
   Timer timer;
-  //Called in initialise to fetch the first 2 pieces and show them thread safe because linked
+  //Called in initialise to fetch the first 2 pieces and show them thread safely because linked
   // lists are not thread safe
   Runnable spawnThread = new Runnable() {
     @Override
@@ -94,20 +94,20 @@ public class MultiplayerGame extends Game{
         handlePiece(message);
       }
     }));
-    generatePieces();
+    for (int i = 0; i < 5 ; i++) {
+      communicator.send("PIECE");
+    }
   }
 
   @Override
   public GamePiece spawnPiece() {
-//    communicator.send("PIECE");
+    communicator.send("PIECE");
     logger.info("Spawn Piece {}", this);
     synchronized (pieces){
       GamePiece piece = pieces.poll();
       logger.info("Spawning Piece  {}", piece);
       return piece;
     }
-
-
   }
 
   @Override
@@ -124,19 +124,6 @@ public class MultiplayerGame extends Game{
   protected void score(int numberOfLines, int numberOfBlocks) {
     super.score(numberOfLines, numberOfBlocks);
     communicator.send("SCORE " + getScore());
-  }
-
-  public void generatePieces() {
-    timer = new Timer();
-    TimerTask task = new TimerTask() {
-      @Override
-      public void run() {
-        if (pieces.size() < 500) {
-          communicator.send("PIECE");
-        }
-      }
-    };
-    timer.schedule(task, 0, 10);
   }
 
   @Override

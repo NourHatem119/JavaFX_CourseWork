@@ -1,23 +1,48 @@
 package uk.ac.soton.comp1206.ux;
 
+import java.io.File;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 public class Multimedia {
 
-  MediaPlayer audio;
-  MediaPlayer music;
-  public void playAudio(Media audio) {
-    this.audio = new MediaPlayer(audio);
-    this.audio.play();
+  private static MediaPlayer audio;
+  private static MediaPlayer Music;
+
+  private static final String path = "d:\\Uni\\P_II\\Coursework\\coursework\\src\\main"
+      + "\\resources";
+  public static final Media challengeMusic = new Media(new File(path + "\\music\\game.wav").toURI().toString());
+  public static final Media menuMusic = new Media(new File("d:\\Uni\\P_II"
+      + "\\Coursework\\coursework\\src\\main\\resources\\music\\menu.mp3").toURI().toString());
+  public static final Media rotateEffect =
+      new Media(new File(path + "\\sounds\\rotate.wav").toURI().toString());
+  public static final Media placeEffect =
+      new Media(new File(path + "\\sounds\\place.wav").toURI().toString());
+  public static final Media lineClearEffect =
+      new Media(new File(path + "\\sounds\\clear.wav").toURI().toString());
+  public static final Media failEffect =
+      new Media(new File(path + "\\sounds\\fail.wav").toURI().toString());
+  public static final Media levelUpEffect =
+      new Media(new File(path + "\\sounds\\level.wav").toURI().toString());
+  public static final Media gameOverEffect =
+      new Media(new File(path + "\\sounds\\explode.wav").toURI().toString());
+  public static final Media lifeLostEffect =
+      new Media(new File(path + "\\sounds\\lifelose.wav").toURI().toString());
+  public static final Media notification =
+      new Media(new File(path + "\\sounds\\message.wav").toURI().toString());
+
+  static public void playAudio(Media sound) {
+    audio = new MediaPlayer(sound);
+    audio.setCycleCount(1);
+    audio.play();
   }
 
-  public void playBackGroundMusic(Media music) {
-    this.music = new MediaPlayer(music);
-    this.music.play();
-    this.music.setCycleCount(MediaPlayer.INDEFINITE);
+  static public void playBackGroundMusic(Media music) {
+    Music = new MediaPlayer(music);
+    Music.play();
+    Music.setCycleCount(MediaPlayer.INDEFINITE);
   }
-  public void stopMusic() {
-    this.music.stop();
+  public static void stopMusic() {
+    Music.stop();
   }
 }

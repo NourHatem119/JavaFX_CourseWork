@@ -28,6 +28,7 @@ import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
+import uk.ac.soton.comp1206.ux.Multimedia;
 
 public class ScoresScene extends BaseScene {
 
@@ -59,6 +60,7 @@ public class ScoresScene extends BaseScene {
     newScore = game.getScore();
     communicator = window.getCommunicator();
     currentGameList = currentScores;
+//    Multimedia.playAudio(Multimedia.challengeMusic);
   }
 
   private static final Logger logger = LogManager.getLogger(ScoresScene.class);
@@ -67,6 +69,7 @@ public class ScoresScene extends BaseScene {
   @Override
   public void initialise() {
     logger.info("Initialising the Scores Scene...");
+    Multimedia.playBackGroundMusic(Multimedia.challengeMusic);
     communicator.addListener(e -> Platform.runLater(() -> {
       if (e.startsWith("HISCORES")) {
         receiveHighScores(e);
@@ -83,7 +86,7 @@ public class ScoresScene extends BaseScene {
    */
   VBox buildScoreBox(String type) {
     VBox scoreBox = new VBox();
-    scoreBox.setAlignment(Pos.CENTER);
+    scoreBox.setAlignment(Pos.TOP_CENTER);
 
     switch (type) {
       case "Online Scores" -> {
@@ -107,6 +110,7 @@ public class ScoresScene extends BaseScene {
       case "This Game" -> {
         scoreBox.getChildren().add(new Text(type));
         scoreBox.getChildren().add(currentGameList);
+        currentGameList.setAlignment(Pos.CENTER);
       }
     }
 
@@ -145,6 +149,7 @@ public class ScoresScene extends BaseScene {
     if (currentGameList == null) {
       localOrGameScores = buildScoreBox("Local Scores");
       if (highScoreIndexLocal != -1) {
+        //TODO Fix not querying new Score
         VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal);
         mainPane.setCenter(addLocalHighScore);
         addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {

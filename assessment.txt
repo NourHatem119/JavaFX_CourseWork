@@ -8,10 +8,10 @@
 [*] Scoring works
 [*] Multiplier works
 [*] Level works
-[ ] Background music
+[*] Background music
 [*] Menu screen present and functioning
 [ ] Menu screen uses animations and visual effects
-[*] Menu screen works
+[*?] Menu screen works
 [*] Instructions screen
 [*] Instructions screen shows blocks
 [*] Challenge screen shows current piece
@@ -22,7 +22,7 @@
 [*] Piece can be swapped
 [*] Sound effects added
 [*] Keyboard support for move and drop
-[ ] Blocks are not just coloured squares
+[*?] Blocks are not just coloured squares
 [*] Placement circle shown on current piece
 [*] Blocks are placed on their centre
 [*] Hover effect on blocks
@@ -42,14 +42,14 @@
 [*] Lobby updates games as new ones created
 [*] Can create a game
 [*] Can join a game
-[*?] Can send a chat message
-[*?] Can receive a chat message
+[*] Can send a chat message
+[*] Can receive a chat message
 [*] Can start a game (if host)
 [*] Game starts when not host
-[???] Error states handled
+[*] Error states handled
 [*] Can play a multiplayer game with a friend/second client
 [*] Scores update during multiplayer game
-[??] Eliminated players shown during multiplayer game
+[?] Eliminated players shown during multiplayer game
 [*] Scores shows multiplayer game scores
 [ ] Good level of challenge, number of extensions, technical achievement
 [ ] Code is commented with javadoc and line comments and of good quality and structure
