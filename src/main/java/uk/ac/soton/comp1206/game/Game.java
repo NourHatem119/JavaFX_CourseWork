@@ -337,8 +337,8 @@ public class Game {
   }
 
   public int getTimerDelay() {
-    return Math.max(2500, 12000 - 500 * getLevel());
-//    return Integer.MAX_VALUE;
+//    return Math.max(2500, 12000 - 500 * getLevel());
+    return 2500;
   }
 
   public void setGameLoop(GameLoopListener listener) {

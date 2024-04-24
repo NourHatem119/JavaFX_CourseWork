@@ -38,7 +38,7 @@ public class ScoresList extends VBox {
     for (Pair<String, Integer> singleScore : scoresList) {
       logger.info("Item Added {} : {}", singleScore.getKey(), singleScore.getValue());
       var score = new Text(singleScore.getKey() + ":" + singleScore.getValue().toString());
-      score.getStyleClass().add("score");
+      score.getStyleClass().add("scoreitem");
       FadeTransition transition = new FadeTransition(Duration.millis(250), score);
       transition.setFromValue(0.0);
       transition.setToValue(1.0);

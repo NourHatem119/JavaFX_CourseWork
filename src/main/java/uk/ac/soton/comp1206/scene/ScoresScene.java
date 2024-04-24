@@ -9,23 +9,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,72 +76,46 @@ public class ScoresScene extends BaseScene {
     scene.setOnKeyPressed(this::keyClicked);
   }
 
-  @Override
-  public void build() {
-    root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
-    var scoresPane = new StackPane();
-    scoresPane.setMaxWidth(gameWindow.getWidth());
-    scoresPane.setMaxHeight(gameWindow.getHeight());
-    scoresPane.getStyleClass().add("menu-background");
-    root.getChildren().add(scoresPane);
+  /**
+   *Generates a VBox depending on the type given
+   * @param type type of the score box to be generated
+   * @return the score box generated
+   */
+  VBox buildScoreBox(String type) {
+    VBox scoreBox = new VBox();
+    scoreBox.setAlignment(Pos.CENTER);
 
-    localScoresList = new ScoresList();
-    onlineScoresList = new ScoresList();
-    localScoresList.listProperty().bind(localScores);
-    remoteScores = FXCollections.observableArrayList(remoteScoresList);
-    SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
-    onlineScoresList.listProperty().bind(wrap);
+    switch (type) {
+      case "Online Scores" -> {
+        onlineScoresList = new ScoresList();
+        remoteScores = FXCollections.observableArrayList(remoteScoresList);
+        SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
+        onlineScoresList.listProperty().bind(wrap);
+        onlineScoresList.setAlignment(Pos.CENTER);
 
-
-    localScoresList.setAlignment(Pos.CENTER);
-    onlineScoresList.setAlignment(Pos.CENTER);
-
-    mainPane = new BorderPane();
-
-    int highScoreIndexLocal = highScoreIndexLocal();
-
-    VBox localOrGameScores = new VBox();
-    localOrGameScores.setAlignment(Pos.CENTER);
-
-
-    if (currentGameList == null) {
-      localOrGameScores.getChildren().add(new Text("Local Scores"));
-      localOrGameScores.getChildren().add(localScoresList);
-      if (highScoreIndexLocal != -1) {
-        VBox addLocalHighScore = getNewLocalHighScore(highScoreIndexLocal);
-        mainPane.setCenter(addLocalHighScore);
-        addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {
-          mainPane.getChildren().remove(addLocalHighScore);
-        });
+        scoreBox.getChildren().add(new Text(type));
+        scoreBox.getChildren().add(onlineScoresList);
       }
-    } else {
-      localOrGameScores.getChildren().add(new Text("This Game"));
-      localOrGameScores.getChildren().add(currentGameList);
+      case "Local Scores" -> {
+        localScoresList = new ScoresList();
+        localScoresList.listProperty().bind(localScores);
+        localScoresList.setAlignment(Pos.CENTER);
+
+        scoreBox.getChildren().add(new Text(type));
+        scoreBox.getChildren().add(localScoresList);
+      }
+      case "This Game" -> {
+        scoreBox.getChildren().add(new Text(type));
+        scoreBox.getChildren().add(currentGameList);
+      }
     }
 
-
-    VBox onlineScoresBox = new VBox();
-    onlineScoresBox.getChildren().add(new Text("Online Scores"));
-    onlineScoresBox.getChildren().add(onlineScoresList);
-    onlineScoresBox.setAlignment(Pos.CENTER);
-    localOrGameScores.getChildren().get(0).getStyleClass().add("title");
-    onlineScoresBox.getChildren().get(0).getStyleClass().add("title");
-    HBox allScores = new HBox();
-    allScores.getChildren().addAll(localOrGameScores, onlineScoresBox);
-    allScores.setAlignment(Pos.CENTER);
-    allScores.setSpacing(20);
-    VBox scoresContainer = new VBox();
-    scoresContainer.setAlignment(Pos.CENTER);
-    Text gameoverText = new Text("GAMEOVER");
-    gameoverText.getStyleClass().add("bigtitle");
-    var highScoresText = new Text("HIGHSCORES");
-    highScoresText.getStyleClass().add("bigtitle");
-    scoresContainer.getChildren().addAll(gameoverText, highScoresText, allScores);
-    mainPane.setCenter(scoresContainer);
-    scoresPane.getChildren().add(mainPane);
+    scoreBox.getChildren().get(0).getStyleClass().add("title");
+    return scoreBox;
   }
 
-  private VBox getNewLocalHighScore(int highScoreIndexLocal) {
+
+  private VBox buildHighScoreAdding(int highScoreIndexLocal) {
     var nameForNewScore = new TextField();
     nameForNewScore.setPromptText("Enter Name");
     nameForNewScore.setPrefWidth(50);
@@ -164,6 +132,71 @@ public class ScoresScene extends BaseScene {
     });
     return new VBox(nameForNewScore, submitLocalScore);
   }
+
+
+  /**
+   * generates an HBox with all the High Score Components
+   * @return An HBox containing all the scoring stuff
+   */
+  HBox buildScoresBox() {
+    int highScoreIndexLocal = highScoreIndexLocal();
+
+    VBox localOrGameScores;
+    if (currentGameList == null) {
+      localOrGameScores = buildScoreBox("Local Scores");
+      if (highScoreIndexLocal != -1) {
+        VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal);
+        mainPane.setCenter(addLocalHighScore);
+        addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {
+          mainPane.getChildren().remove(addLocalHighScore);
+        });
+      }
+    } else {
+      localOrGameScores = buildScoreBox("This Game");
+    }
+
+    VBox onlineScoresBox = buildScoreBox("Online Scores");
+    HBox allScores = new HBox();
+    allScores.getChildren().addAll(localOrGameScores, onlineScoresBox);
+    allScores.setAlignment(Pos.CENTER);
+    allScores.setSpacing(20);
+     return allScores;
+  }
+
+
+  @Override
+  public void build() {
+    root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
+    var scoresPane = new StackPane();
+    scoresPane.setMaxWidth(gameWindow.getWidth());
+    scoresPane.setMaxHeight(gameWindow.getHeight());
+    scoresPane.getStyleClass().add("menu-background");
+    root.getChildren().add(scoresPane);
+
+
+    mainPane = new BorderPane();
+
+
+    var scoresContainer = new VBox();
+    scoresContainer.setAlignment(Pos.CENTER);
+
+
+    var gameoverText = new Text("GAMEOVER");
+    gameoverText.getStyleClass().add("bigtitle");
+
+
+    var highScoresText = new Text("HIGHSCORES");
+    highScoresText.getStyleClass().add("bigtitle");
+
+
+    scoresContainer.getChildren().addAll(gameoverText, highScoresText, buildScoresBox());
+
+    mainPane.setCenter(scoresContainer);
+
+    scoresPane.getChildren().add(mainPane);
+  }
+
+
 
   private int highScoreIndexLocal() {
     for (int i = 0; i < localScores.getSize(); i++) {

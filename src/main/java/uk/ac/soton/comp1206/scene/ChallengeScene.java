@@ -95,7 +95,7 @@ public class ChallengeScene extends BaseScene {
     titleTxt.getStyleClass().add("title");
 
     var topBar = new HBox();
-    topBar.setSpacing(180);
+    topBar.setSpacing(170);
     topBar.setPadding(new Insets(topBar.getPadding().getTop(), 20,
         topBar.getPadding().getBottom(), 10));
 
@@ -183,8 +183,15 @@ public class ChallengeScene extends BaseScene {
     mainPane.setCenter(board);
     mainPane.setRight(buildSideBar());
     mainPane.setBottom(buildBottomBar());
-    mainPane.setTop(buildTopBar("Challenge Mode"));
-
+    if (this instanceof MultiPlayerScene) {
+      HBox topBar = buildTopBar("MultiPlayer Match");
+      topBar.setSpacing(164);
+      mainPane.setTop(topBar);
+    } else {
+      HBox topBar = buildTopBar("Challenge Mode");
+      topBar.setSpacing(179);
+      mainPane.setTop(topBar);
+    }
     //Handle block on gameboard grid being clicked
     board.setOnBlockClick(this::blockClicked);
     currentPieceShow.setOnPieceClick(this::pieceClicked);
