@@ -23,6 +23,11 @@ public class PieceBoard extends GameBoard {
     super(3, 3, width, height);
   }
 
+  /**
+   * Indicates whether this pieceBoard is the current piece or not.
+   *
+   * @return whether it is the current piece or not
+   */
   public boolean isCurrentPiece() {
     return isCurrentPiece;
   }
@@ -39,7 +44,7 @@ public class PieceBoard extends GameBoard {
   }
 
   /**
-   * Sets the show for a piece.
+   * Sets the display for a piece.
    *
    * @param gamePiece the piece to be shown
    */
@@ -57,7 +62,7 @@ public class PieceBoard extends GameBoard {
    * @param x column
    * @param y row
    */
-  protected GameBlock createBlock(int x, int y) {
+  protected void createBlock(int x, int y) {
     var blockWidth = width / cols;
     var blockHeight = height / rows;
 
@@ -76,7 +81,6 @@ public class PieceBoard extends GameBoard {
     //Add a mouse click handler to the block to trigger GameBoard blockClicked method
     block.setOnMouseClicked((e) -> blockClicked(e, block));
 
-    return block;
   }
 
   /**

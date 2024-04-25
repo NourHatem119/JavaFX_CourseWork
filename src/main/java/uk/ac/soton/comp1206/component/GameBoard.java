@@ -8,14 +8,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
 import uk.ac.soton.comp1206.event.RightClickedListener;
-import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
 
 /**
  * A GameBoard is a visual component to represent the visual GameBoard. It extends a GridPane to
  * hold a grid of GameBlocks.
  * <p>
- * The GameBoard can hold an internal grid of it's own, for example, for displaying an upcoming
+ * The GameBoard can hold an internal grid of its own, for example, for displaying an upcoming
  * block. It also be linked to an external grid, for the main game board.
  * <p>
  * The GameBoard is only a visual representation and should not contain game logic or model logic in
@@ -82,7 +81,7 @@ public class GameBoard extends GridPane {
 
 
   /**
-   * Create a new GameBoard with it's own internal grid, specifying the number of columns and rows,
+   * Create a new GameBoard with its own internal grid, specifying the number of columns and rows,
    * along with the visual width and height.
    *
    * @param cols   number of columns for internal grid
@@ -106,7 +105,7 @@ public class GameBoard extends GridPane {
   }
 
   /**
-   * Get a specific block from the GameBoard, specified by it's row and column
+   * Get a specific block from the GameBoard, specified by its row and column
    *
    * @param x column
    * @param y row
@@ -142,7 +141,7 @@ public class GameBoard extends GridPane {
    * @param x column
    * @param y row
    */
-  protected GameBlock createBlock(int x, int y) {
+  protected void createBlock(int x, int y) {
     var blockWidth = width / cols;
     var blockHeight = height / rows;
 
@@ -170,7 +169,6 @@ public class GameBoard extends GridPane {
     block.setOnMouseEntered((e -> hoverBlock(block)));
     block.setOnMouseExited((e -> unhover(block)));
 
-    return block;
   }
 
   /**
@@ -197,7 +195,7 @@ public class GameBoard extends GridPane {
   }
 
   /**
-   * Set the listener to handle an event when right click is triggered
+   * Set the listener to handle an event when right click is triggered.
    *
    * @param listener listener to add
    */
@@ -205,6 +203,11 @@ public class GameBoard extends GridPane {
     this.rightClickedListener = listener;
   }
 
+  /**
+   * Handles the event when right click is triggered.
+   *
+   * @param rightClick right click event
+   */
   private void rightClicked(MouseEvent rightClick) {
     logger.info("RightClick triggered on main GameBoard...");
     if (rightClickedListener != null) {
@@ -212,6 +215,11 @@ public class GameBoard extends GridPane {
     }
   }
 
+  /**
+   * Sets the style of the block given as hovered.
+   *
+   * @param block the block that has been hovered
+   */
   private void hoverBlock(GameBlock block) {
     if (currentBlock != null) {
       unhover(currentBlock);
@@ -220,10 +228,18 @@ public class GameBoard extends GridPane {
     currentBlock.setIsHover(true);
   }
 
+  /**
+   * Removes the hover effect from the block.
+   *
+   * @param block the block to remove hover effect from
+   */
   private void unhover(GameBlock block) {
     block.setIsHover(false);
   }
 
+  /**
+   * Handles when Up/W key is clicked.
+   */
   public void upClicked() {
     if (currentBlock == null) {
       currentBlock = blocks[0][0];
@@ -238,6 +254,9 @@ public class GameBoard extends GridPane {
     }
   }
 
+  /**
+   * Handles when Down/S key is clicked.
+   */
   public void downClicked() {
     if (currentBlock == null) {
       currentBlock = blocks[0][0];
@@ -252,6 +271,9 @@ public class GameBoard extends GridPane {
     }
   }
 
+  /**
+   * Handles when RightArrow/D key is clicked.
+   */
   public void rightArrowClicked() {
     if (currentBlock == null) {
       currentBlock = blocks[0][0];
@@ -266,6 +288,9 @@ public class GameBoard extends GridPane {
     }
   }
 
+  /**
+   * Handles when LeftArrow/A key is clicked.
+   */
   public void leftArrowClicked() {
     if (currentBlock == null) {
       currentBlock = blocks[0][0];
@@ -280,12 +305,13 @@ public class GameBoard extends GridPane {
     }
   }
 
-  public void playPiece(GamePiece piece) {
-    grid.playPiece(currentBlock.getX(), currentBlock.getY(), piece);
-  }
-
-  public void fadeOut(HashSet<GameBlockCoordinate> blocks) {
-    for (GameBlockCoordinate block : blocks) {
+  /**
+   * Fades out the set Of GameBlocks that their coordinates have been passed.
+   *
+   * @param blocksCoordinates blocksCoordinates of the game blocks to be faded.
+   */
+  public void fadeOut(HashSet<GameBlockCoordinate> blocksCoordinates) {
+    for (GameBlockCoordinate block : blocksCoordinates) {
       this.blocks[block.getX()][block.getY()].fadeOut();
     }
   }

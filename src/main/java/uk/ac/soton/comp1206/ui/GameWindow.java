@@ -19,6 +19,7 @@ import uk.ac.soton.comp1206.scene.MenuScene;
 import uk.ac.soton.comp1206.scene.MultiPlayerScene;
 import uk.ac.soton.comp1206.scene.OpeningScene;
 import uk.ac.soton.comp1206.scene.ScoresScene;
+import uk.ac.soton.comp1206.scene.SettingsScene;
 
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between
@@ -97,6 +98,16 @@ public class GameWindow {
     loadScene(new ChallengeScene(this));
   }
 
+
+  public void startLobby() {
+    loadScene(new LobbyScene(this));
+  }
+
+
+  public void startMultiplayer() {
+    loadScene(new MultiPlayerScene(this));
+  }
+
   /**
    * Display the instructions for the game
    */
@@ -113,13 +124,11 @@ public class GameWindow {
     }
   }
 
-  public void startLobby() {
-    loadScene(new LobbyScene(this));
+  public void startSettings() {
+    loadScene(new SettingsScene(this));
   }
 
-  public void startMultiplayer() {
-    loadScene(new MultiPlayerScene(this));
-  }
+
 
   /**
    * Setup the default settings for the stage itself (the window), such as the title and minimum

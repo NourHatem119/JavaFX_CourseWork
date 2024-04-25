@@ -3,7 +3,6 @@ package uk.ac.soton.comp1206.scene;
 import java.util.Objects;
 import javafx.animation.Animation;
 import javafx.animation.RotateTransition;
-import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -41,6 +40,35 @@ public class MenuScene extends BaseScene {
     logger.info("Creating Menu Scene");
   }
 
+  ImageView initialiseImage() {
+    Image title = new Image(
+        Objects.requireNonNull(getClass().getResourceAsStream("/_images/TetrECS.png")));
+    ImageView titleView = new ImageView(title);
+    titleView.setFitWidth(700);
+    titleView.setFitHeight(150);
+    RotateTransition rotation = new RotateTransition(Duration.millis(2000), titleView);
+    rotation.setToAngle(5);
+    rotation.setFromAngle(-5);
+    rotation.setAutoReverse(true);
+    rotation.setCycleCount(Animation.INDEFINITE);
+    rotation.play();
+    return titleView;
+  }
+
+  VBox buildButtonsBox() {
+    var play = new Button("Play");
+    var multiplayer = new Button("Multiplayer");
+    var instructions = new Button("How To Play");
+    var settings = new Button("Settings");
+    var exit = new Button("Exit");
+    var buttons = new VBox(play, multiplayer, instructions, settings, exit);
+    for (Node button : buttons.getChildren()) {
+      button.getStyleClass().add("menuItem");
+    }
+    buttons.setAlignment(Pos.CENTER);
+    return buttons;
+  }
+
   /**
    * Build the menu layout.
    */
@@ -59,45 +87,24 @@ public class MenuScene extends BaseScene {
     var mainPane = new BorderPane();
     menuPane.getChildren().add(mainPane);
 
-    //Awful title
-    Image title = new Image(
-        Objects.requireNonNull(getClass().getResourceAsStream("/_images/TetrECS.png")));
-    ImageView titleView = new ImageView(title);
-    titleView.setFitWidth(700);
-    titleView.setFitHeight(150);
-    RotateTransition rotation = new RotateTransition(Duration.millis(2000), titleView);
-    rotation.setToAngle(5);
-    rotation.setFromAngle(-5);
-    rotation.setAutoReverse(true);
-    rotation.setCycleCount(Animation.INDEFINITE);
-    rotation.play();
-//        var title = new Text("TetrECS");
-//        title.getStyleClass().add("title");
+    ImageView titleView = initialiseImage();
     mainPane.setCenter(titleView);
     BorderPane.setAlignment(titleView, Pos.BOTTOM_CENTER);
 
-    //For now, let us just add a button that starts the game. I'm sure you'll do something way better.
-    var play = new Button("Play");
-    var multiplayer = new Button("Multiplayer");
-    var instructions = new Button("How To Play");
-    var exit = new Button("Exit");
-    var buttons = new VBox(play, multiplayer, instructions, exit);
-    for (Node button : buttons.getChildren()) {
-      button.getStyleClass().add("menuItem");
-    }
-    buttons.setAlignment(Pos.CENTER);
+    var buttons = buildButtonsBox();
     mainPane.setBottom(buttons);
 
     //Bind the button action to the startGame method in the menu
-    play.setOnMouseClicked(this::startGame);
-    play.setOnKeyPressed(e -> {
+    buttons.getChildren().get(0).setOnMouseClicked(this::startGame);
+    buttons.getChildren().get(0).setOnKeyPressed(e -> {
       if (e.getCode().equals(KeyCode.ENTER)) {
         startGame(e);
       }
     });
-    instructions.setOnMouseClicked(this::startInstructions);
-    multiplayer.setOnAction(this::startLobby);
-    exit.setOnAction(this::exitGame);
+    buttons.getChildren().get(1).setOnMouseClicked(this::startLobby);
+    buttons.getChildren().get(2).setOnMouseClicked(this::startInstructions);
+    buttons.getChildren().get(3).setOnMouseClicked(this::startSettings);
+    buttons.getChildren().get(4).setOnMouseClicked(this::exitGame);
     mainPane.setOnKeyPressed(e -> {
       if (e.getCode().equals(KeyCode.ESCAPE)) {
         exitGame(e);
@@ -110,7 +117,7 @@ public class MenuScene extends BaseScene {
    *
    * @param event Event triggered
    */
-  private void startLobby(ActionEvent event) {
+  private void startLobby(Event event) {
     Multimedia.playAudio(Multimedia.clickEffect);
     Multimedia.audio.setOnEndOfMedia(gameWindow::startLobby);
   }
@@ -144,6 +151,12 @@ public class MenuScene extends BaseScene {
     Multimedia.stopMusic();
     Multimedia.playAudio(Multimedia.clickEffect);
     Multimedia.audio.setOnEndOfMedia(gameWindow::startInstructions);
+  }
+
+  private void startSettings(MouseEvent event) {
+    Multimedia.stopMusic();
+    Multimedia.playAudio(Multimedia.clickEffect);
+    Multimedia.audio.setOnEndOfMedia(gameWindow::startSettings);
   }
 
   /**

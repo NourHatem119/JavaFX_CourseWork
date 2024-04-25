@@ -13,6 +13,16 @@
   -fx-font-size: 45;
 }
 
+.volume {
+  -fx-background-color: transparent;
+  -fx-fill: White;
+  -fx-font-family: 'YouMurderer BB';
+  -fx-font-size: 70;
+  -fx-font-weight: 700;
+  -fx-stroke: black;
+  -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+
 .submitButton {
   -fx-background-color: transparent;
   -fx-text-fill: Black;
@@ -32,6 +42,11 @@
 
 .scores-background {
   -fx-background-image: url("../_images/GameOver.jpg");
+  -fx-background-size: cover;
+}
+
+.settings {
+  -fx-background-image: url("../_images/settings.jpg");
   -fx-background-size: cover;
 }
 
