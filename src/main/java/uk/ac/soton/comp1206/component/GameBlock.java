@@ -20,7 +20,6 @@ import org.apache.logging.log4j.Logger;
  * Displays an empty square (when the value is 0) or a coloured square depending on value.
  * <p>
  * The GameBlock value should be bound to a corresponding block in the Grid model.
- * TODO Add Custom Squares
  */
 public class GameBlock extends Canvas {
 
@@ -154,6 +153,8 @@ public class GameBlock extends Canvas {
     //Colour fill
     gc.setFill(colour);
     gc.fillRect(0, 0, width, height);
+    gc.strokeRoundRect(0, 0, width, height,30,30);
+    gc.strokeRoundRect(0, 0, width, height,120,120);
 
     //Border
     gc.setStroke(Color.BLACK);
@@ -205,7 +206,7 @@ public class GameBlock extends Canvas {
 
   public void hoverBlock() {
     var gc = getGraphicsContext2D();
-    gc.setFill(Color.rgb(230, 230, 230, 0.3));
+    gc.setFill(Color.rgb(255, 255, 255, 0.2));
     gc.fillRect(0, 0, width, height);
   }
 

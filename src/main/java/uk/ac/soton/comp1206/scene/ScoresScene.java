@@ -185,7 +185,6 @@ public class ScoresScene extends BaseScene {
     VBox localOrGameScores;
     if (currentGameList == null) {
       localOrGameScores = buildScoreBox("Local Scores");
-
     } else {
       localOrGameScores = buildScoreBox("This Game");
     }
@@ -219,13 +218,14 @@ public class ScoresScene extends BaseScene {
 
     scoresContainer.getChildren().addAll(highScoresText, buildScoresBox());
 
-    if (highScoreIndexLocal != -1) {
-      //TODO Fix not querying new Score
-      VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal, scoresContainer);
-      addLocalHighScore.setVisible(true);
+    if (currentGameList == null) {
+      if (highScoreIndexLocal != -1) {
+        VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal, scoresContainer);
+        addLocalHighScore.setVisible(true);
 
-      mainPane.setCenter(addLocalHighScore);
+        mainPane.setCenter(addLocalHighScore);
 
+      }
     } else {
       mainPane.setCenter(scoresContainer);
     }

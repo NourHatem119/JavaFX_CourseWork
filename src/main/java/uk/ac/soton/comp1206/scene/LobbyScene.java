@@ -42,7 +42,7 @@ public class LobbyScene extends BaseScene {
   SimpleBooleanProperty host = new SimpleBooleanProperty(false); //Whether a host or not.
 
 
-  TextFlow channels; //ui display of the channels.
+  VBox channels; //ui display of the channels.
   VBox leftPanel; //title, create a game button, and current channels.
   TextFlow users = new TextFlow(); //Current users in the channel.
 
@@ -52,7 +52,7 @@ public class LobbyScene extends BaseScene {
   TextFlow chat;
 
   Text currentGames;
-  Text createChannel;
+  Button createChannel;
 
   boolean joined;
   ArrayList<String> channelsNames = new ArrayList<>();
@@ -155,16 +155,16 @@ public class LobbyScene extends BaseScene {
     String[] channels = message.replace("CHANNELS ", "").split("\n");
     channelsNames.addAll(List.of(channels));
     for (String channel : channels) {
-      var channelName = new Text(channel + "\n");
-      channelName.getStyleClass().add("heading");
-      channelName.setOnMouseClicked(e -> {
+      var joinChannel = new Button(channel);
+//      channelName.getStyleClass().add("heading");
+      joinChannel.setOnMouseClicked(e -> {
         joinChannel(channel);
         if (!joined) {
           showChannelChat(channel);
         }
         host.set(message.contains("HOST"));
       });
-      this.channels.getChildren().add(channelName);
+      this.channels.getChildren().add(joinChannel);
     }
   }
 
@@ -191,8 +191,7 @@ public class LobbyScene extends BaseScene {
     currentGames = new Text("Current Games");
     currentGames.getStyleClass().add("title");
 
-    createChannel = new Text("Host a new Game");
-    createChannel.getStyleClass().add("title");
+    createChannel = new Button("Host a new Game");
     createChannel.setOnMouseClicked(e -> {
       leftPanel.getChildren().clear();
       leftPanel.getChildren().addAll(currentGames, createChannel);
@@ -212,9 +211,9 @@ public class LobbyScene extends BaseScene {
       });
     });
 
-    channels = new TextFlow();
-    channels.setLineSpacing(15);
-    channels.setPadding(new Insets(25, channels.getPadding().getRight(),
+    channels = new VBox();
+    channels.setSpacing(2.0);
+    channels.setPadding(new Insets(10, channels.getPadding().getRight(),
         channels.getPadding().getBottom(), channels.getPadding().getLeft()));
 
     leftPanel.getChildren().addAll(currentGames, createChannel, channels);

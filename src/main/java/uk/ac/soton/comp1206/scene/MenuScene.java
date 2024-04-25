@@ -83,7 +83,7 @@ public class MenuScene extends BaseScene {
     var exit = new Button("Exit");
     var buttons = new VBox(play, multiplayer, instructions, exit);
     for (Node button : buttons.getChildren()) {
-      button.getStyleClass().add("button");
+      button.getStyleClass().add("menuItem");
     }
     buttons.setAlignment(Pos.CENTER);
     mainPane.setBottom(buttons);
