@@ -30,6 +30,10 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
+/**
+ * Scores Scene shows the current Local And Online HighScores, and in the case of a Multiplayer Game
+ * it shows the current game's scores and online HighScores.
+ */
 public class ScoresScene extends BaseScene {
 
   private static final Logger logger = LogManager.getLogger(ScoresScene.class);
@@ -37,19 +41,25 @@ public class ScoresScene extends BaseScene {
       + "P_II\\Coursework\\coursework\\scores.txt");
   BorderPane mainPane = new BorderPane();
   Communicator communicator;
+  /**
+   * Creates the local List of scores, and the online list of scores.
+   */
   ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
   public SimpleListProperty<Pair<String, Integer>> localScores =
       new SimpleListProperty<>(FXCollections.observableArrayList(scores));
   ArrayList<Pair<String, Integer>> remoteScoresList = new ArrayList<>();
+  private ObservableList<Pair<String, Integer>> remoteScores;
 
   Game game;
 
+  /**
+   * Custom ui components that displays a list of scores in a fancy way.
+   */
   ScoresList localScoresList;
   ScoresList currentGameList;
   ScoresList onlineScoresList;
 
   int newScore;
-  private ObservableList<Pair<String, Integer>> remoteScores;
 
   public ScoresScene(GameWindow window, Game game, ScoresList currentScores) {
     super(window);

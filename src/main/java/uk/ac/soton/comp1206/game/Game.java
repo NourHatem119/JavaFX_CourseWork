@@ -22,41 +22,70 @@ import uk.ac.soton.comp1206.event.NextPieceListener;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
- * The Game class handles the main logic, state and properties of the TetrECS game. Methods to
- * manipulate the game state and to handle actions made by the player should take place inside this
- * class.
+ * The Game class handles the main logic, state and properties of the TetrECS Single Player game.
  */
 public class Game {
 
   private static final Logger logger = LogManager.getLogger(Game.class);
 
   /**
-   * Number of rows
+   * Number of rows.
    */
   protected final int rows;
 
   /**
-   * Number of columns
+   * Number of columns.
    */
   protected final int cols;
 
   /**
-   * The grid model linked to the game
+   * The grid model linked to the game.
    */
   protected final Grid grid;
+
+  /**
+   * The score property linked to the playing scenes.
+   */
   private final IntegerProperty score = new SimpleIntegerProperty(0);
+  /**
+   * The level property linked to the playing scenes.
+   */
   private final IntegerProperty level = new SimpleIntegerProperty(0);
+  /**
+   * The lives property linked to the playing scenes.
+   */
   private final IntegerProperty lives = new SimpleIntegerProperty(3);
+  /**
+   * The multiplier property.
+   */
   private final IntegerProperty multiplier = new SimpleIntegerProperty(1);
+  /**
+   * NextPiece Listener to listen when next piece and update the ui.
+   */
   public NextPieceListener nextPieceListener;
+  /**
+   * LineCleared Listener to listen when a line is cleared and update the ui.
+   */
   public LineClearedListener lineClearedListener;
+  /**
+   * GameLoop Listener to listen when one Game Loop is finished and update the ui.
+   */
   public GameLoopListener gameLoopListener;
+  /**
+   * GameOver Listener to listen when the game is over and update the ui.
+   */
   public GameOverListener gameOverListener;
+  /**
+   * A GamePiece object holding the piece to be played currently.
+   */
   protected GamePiece currentPiece;
+  /**
+   * A GamePiece object holding the piece to be played next.
+   */
   protected GamePiece nextPiece;
   ScheduledFuture<?> futureTask;
   private Timer timer;
-  private ScheduledExecutorService executor;
+  private final ScheduledExecutorService executor;
 
   /**
    * Create a new game with the specified rows and columns. Creates a corresponding grid model.
@@ -130,7 +159,7 @@ public class Game {
   }
 
   /**
-   * Start the game
+   * Start the game.
    */
   public void start() {
     logger.info("Starting game");
@@ -138,7 +167,7 @@ public class Game {
   }
 
   /**
-   * Initialise a new game and set up anything that needs to be done at the start
+   * Initialise a new game and set up anything that needs to be done at the start.
    */
   public void initialiseGame() {
     logger.info("Initialising game");
@@ -148,7 +177,7 @@ public class Game {
   }
 
   /**
-   * Handle what should happen when a particular block is clicked
+   * Handle what should happen when a block is clicked.
    *
    * @param gameBlock the block that was clicked
    */
@@ -195,12 +224,21 @@ public class Game {
     return rows;
   }
 
+  /**
+   * Generates a new piece randomly.
+   *
+   * @return The new piece generated
+   */
   public GamePiece spawnPiece() {
     logger.info("Spawning a new Piece...");
     Random rand = new Random();
     return GamePiece.createPiece(rand.nextInt(GamePiece.PIECES));
   }
 
+  /**
+   * Replaces the current piece with the next piece, spawns a new piece, and update the ui
+   * accordingly.
+   */
   protected void nextPiece() {
     currentPiece = nextPiece;
     nextPiece = spawnPiece();
@@ -211,7 +249,7 @@ public class Game {
   }
 
   /**
-   * Handles the logic after each adding a piece.
+   * Handles the logic after each adding a piece(line clearance).
    */
   private void afterPiece() {
     logger.info("Piece Placed, running afterPiece Procedures...");
@@ -240,6 +278,11 @@ public class Game {
     multiplier(linesCleared);
   }
 
+  /**
+   * Handles the level up.
+   *
+   * @return whether the player has levelled up or not
+   */
   public boolean levelUp() {
     var oldLevel = getLevel();
     setLevel(getScore() / 1000);
@@ -282,10 +325,23 @@ public class Game {
     return blocksToClear;
   }
 
+  /**
+   * Updates the score according to the lines cleared and blocks cleared depending on whether the
+   * user cleared lines or not.
+   *
+   * @param numberOfLines  number of lines cleared
+   * @param numberOfBlocks number of blocks cleared
+   */
   protected void score(int numberOfLines, int numberOfBlocks) {
     setScore((numberOfLines * numberOfBlocks * 10 * getMultiplier()) + getScore());
   }
 
+  /**
+   * Handles the increasing and resetting the multiplier depending on the clearance of lines when a
+   * piece is placed.
+   *
+   * @param linesCleared the number of lines cleared
+   */
   protected void multiplier(int linesCleared) {
     if (linesCleared > 0) {
       setMultiplier(getMultiplier() + 1);
@@ -294,6 +350,11 @@ public class Game {
     }
   }
 
+  /**
+   * Handles the logic behind rotating pieces.
+   *
+   * @param direction the direction of piece rotation
+   */
   public void rotateCurrentPiece(String direction) {
     if (direction.equals("right")) {
       currentPiece.rotate();
@@ -326,6 +387,11 @@ public class Game {
     }
   }
 
+  /**
+   * Gets the time for each Game Loop depending on the current level.
+   *
+   * @return the current Game Loop Duration
+   */
   public int getTimerDelay() {
     return Math.max(2500, 12000 - 500 * getLevel());
   }
@@ -334,6 +400,10 @@ public class Game {
     this.gameLoopListener = listener;
   }
 
+  /**
+   * If the Player still has lives, the Game Loop(Timer) is restarted, lives are decreased, fetch
+   * next piece, and reset the multiplier, otherwise the game is ended.
+   */
   public void gameLoop() {
     if (getLives() <= 0) {
       logger.info("end Game...");
@@ -353,6 +423,9 @@ public class Game {
     }
   }
 
+  /**
+   * Starts the Game Loop, and sets the ui to update accordingly.
+   */
   protected void createTimer() {
     futureTask = executor.schedule(this::gameLoop, getTimerDelay(), TimeUnit.MILLISECONDS);
     if (gameLoopListener != null) {
@@ -360,6 +433,9 @@ public class Game {
     }
   }
 
+  /**
+   * Cancel the timer and resets it.
+   */
   private void restartTimer() {
     if (futureTask != null) {
       futureTask.cancel(true);
@@ -367,6 +443,9 @@ public class Game {
     createTimer();
   }
 
+  /**
+   * End the Game.
+   */
   public void endGame() {
     logger.info("Game Finished...");
     executor.shutdownNow();

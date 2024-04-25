@@ -8,14 +8,24 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.network.Communicator;
 
+/**
+ * The MultiplayerGame class handles the main logic, state and properties of the TetrECS online
+ * Multiplayer game.
+ */
 public class MultiplayerGame extends Game {
 
   private static final Logger logger = LogManager.getLogger(MultiplayerGame.class);
+
+  /**
+   * A Queue containing pieces that has been received from the server.
+   */
   final Queue<GamePiece> pieces = new LinkedList<>();
   Communicator communicator;
   Timer timer;
+
   /**
-   * Create a new game with the specified rows and columns. Creates a corresponding grid model.
+   * Create a new Multiplayer game with the specified rows and columns. Creates a corresponding grid
+   * model.
    *
    * @param cols number of columns
    * @param rows number of rows
@@ -33,8 +43,12 @@ public class MultiplayerGame extends Game {
     for (int i = 0; i < 5; i++) {
       communicator.send("PIECE");
     }
-  }  //Called in initialise to fetch the first 2 pieces and show them thread safely because linked
-  // lists are not thread safe
+  }
+
+  /**
+   * Called in initialise to fetch the first 2 pieces and show them thread safely because linked
+   * lists are not thread safe.
+   */
   Runnable spawnThread = new Runnable() {
     @Override
     public void run() {
@@ -43,7 +57,6 @@ public class MultiplayerGame extends Game {
       }
       if (currentPiece != null && nextPiece == null) {
         nextPiece = spawnPiece();
-        logger.info("Spawn Thread {}", this);
       }
 
       if (currentPiece == null || nextPiece == null) {
@@ -51,29 +64,22 @@ public class MultiplayerGame extends Game {
       } else if (nextPieceListener != null) {
         nextPieceListener.nextPiece(currentPiece, nextPiece);
       }
+      logger.info("Current Piece {}, and nextPiece {} initialised successfully...",
+          currentPiece, nextPiece);
     }
   };
 
   @Override
   public void initialiseGame() {
     Platform.runLater(spawnThread);
-//    Platform.runLater(() -> {
-//      while(currentPiece==null ||nextPiece==null){
-//        currentPiece = spawnPiece();
-//        nextPiece = spawnPiece();
-//        try {
-//          Thread.sleep(100);
-//        } catch (InterruptedException e) {
-//          throw new RuntimeException(e);
-//        }
-//      }
-//
-//      if (nextPieceListener != null) {
-//        nextPieceListener.nextPiece(currentPiece, nextPiece);
-//      }
-//    });
   }
 
+  /**
+   * Receives the message containing the requested piece from the server and creates a new piece
+   * object with this message, and adds it synchronously.
+   *
+   * @param pieceNo
+   */
   private void handlePiece(String pieceNo) {
     logger.info("Handle Piece {}", this);
     pieceNo = pieceNo.replace("PIECE ", "");
@@ -82,28 +88,49 @@ public class MultiplayerGame extends Game {
       pieces.add(piece);
     }
 
-    logger.info("Piece Added ... {}/{}", piece, pieceNo);
+    logger.info("Piece Added ... {}/({})", piece.toString(), pieceNo + 1);
+    String queueContents = "";
+    for (GamePiece gamePiece : pieces) {
+       queueContents = "Queue Contains [";
+      queueContents += gamePiece.toString() + "(" + gamePiece.getValue() + ")";
+    }
+    logger.info(queueContents);
   }
 
+  /**
+   * Starts the Multiplayer Game.
+   */
   @Override
   public void start() {
     Platform.runLater(this::initialiseGame);
     createTimer();
   }
 
+  /**
+   * Gets the next piece in the queue(Linked List), sends a message to the communicator to
+   * replace it.
+   *
+   * @return the game piece received from the communicator
+   */
   @Override
   public GamePiece spawnPiece() {
     communicator.send("PIECE");
-    logger.info("Spawn Piece {}", this);
     synchronized (pieces) {
       GamePiece piece = pieces.poll();
-      logger.info("Spawning Piece  {}", piece);
+      if (piece != null) {
+        logger.info("Spawned Piece  {}/({})", piece.toString(), piece.getValue());
+      }
       return piece;
     }
   }
 
+  /**
+   * Replaces the current piece with the next piece, spawns a new piece, and updates the ui
+   * accordingly.
+   */
   @Override
   protected void nextPiece() {
+    logger.info("Next piece loaded...");
     currentPiece = nextPiece;
     nextPiece = spawnPiece();
     if (nextPieceListener != null) {
@@ -112,12 +139,22 @@ public class MultiplayerGame extends Game {
     communicator.send("SCORES");
   }
 
+  /**
+   * Updates the score according to the lines cleared and blocks cleared, sends a message to the
+   * communicator telling it the updated score.
+   * @param numberOfLines  number of lines cleared
+   * @param numberOfBlocks number of blocks cleared
+   */
   @Override
   protected void score(int numberOfLines, int numberOfBlocks) {
     super.score(numberOfLines, numberOfBlocks);
     communicator.send("SCORE " + getScore());
   }
 
+  /**
+   * Ends the game and sends a message to the communicator indicating that the game has been
+   * ended for the current player.
+   */
   @Override
   public void endGame() {
     super.endGame();

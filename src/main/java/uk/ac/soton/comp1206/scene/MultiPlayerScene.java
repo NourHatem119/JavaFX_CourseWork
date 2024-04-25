@@ -21,6 +21,9 @@ import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
 
+/**
+ * The Multiplayer scene. Holds the UI for the MultiPlayer mode in the game.
+ */
 public class MultiPlayerScene extends ChallengeScene {
 
   private static final Logger logger = LogManager.getLogger(MultiPlayerScene.class);
@@ -29,8 +32,14 @@ public class MultiPlayerScene extends ChallengeScene {
   ArrayList<Pair<String, Integer>> players = new ArrayList<>();
   ArrayList<String> deadPlayers = new ArrayList<>();
 
+  /**
+   * A Custom Component holding all the scores in the current Multiplayer Game.
+   */
   ScoresList currentScores;
 
+  /**
+   * A timer to periodically request scores.
+   */
   Timer requestScores;
 
   /**
@@ -47,6 +56,9 @@ public class MultiPlayerScene extends ChallengeScene {
     return currentScores;
   }
 
+  /**
+   * Initialises the MultiPlayer Game Scene.
+   */
   @Override
   public void initialise() {
     super.initialise();
@@ -59,9 +71,13 @@ public class MultiPlayerScene extends ChallengeScene {
     requestScores();
   }
 
+  /**
+   * Builds the Multiplayer Game's sideBar.
+   *
+   * @return the Multiplayer Game's sideBar
+   */
   @Override
   protected VBox buildSideBar() {
-
     currentScores = new ScoresList();
     currentPlayers = FXCollections.observableArrayList(players);
     SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(currentPlayers);
@@ -79,22 +95,37 @@ public class MultiPlayerScene extends ChallengeScene {
     return rightPanel;
   }
 
-
-  public void kill(String player) {
+  /**
+   * Adds the given Player to the list of eliminated Players in the current Game.
+   *
+   * @param player player to eliminate
+   */
+  public void eliminate(String player) {
     deadPlayers.add(player);
   }
 
-
+  /**
+   * Set up the MultiPlayerGame object and model.
+   */
   @Override
   public void setupGame() {
     logger.info("Starting Game");
     game = new MultiplayerGame(5, 5, communicator);
   }
 
+  /**
+   * Request the current scores of the game from the server.
+   */
   private void getCurrentScores() {
     communicator.send("SCORES");
   }
 
+  /**
+   * Handles receiving the list of scores from the server, clears the current list and adds the new
+   * List.
+   *
+   * @param s the message received from the server
+   */
   private void handleScores(String s) {
     String[] message = s.split(" ", 2);
     String receivedScores = "";
@@ -117,7 +148,7 @@ public class MultiPlayerScene extends ChallengeScene {
         if (thePlayer.getKey().equals(playerInfo[0])) {
           if (playerInfo[2].contains("DEAD") && !deadPlayers.contains(playerInfo[0])) {
             logger.info("killing player");
-            kill(playerInfo[0]);
+            eliminate(playerInfo[0]);
           } else {
             players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
           }
@@ -137,6 +168,9 @@ public class MultiPlayerScene extends ChallengeScene {
     this.currentScores.reveal(deadPlayers);
   }
 
+  /**
+   * Create a timer that Periodically request the list of scores from the server.
+   */
   private void requestScores() {
     requestScores = new Timer();
     TimerTask requestChannels = new TimerTask() {
@@ -148,6 +182,11 @@ public class MultiPlayerScene extends ChallengeScene {
     requestScores.schedule(requestChannels, 0, 5000);
   }
 
+  /**
+   * Calls the challenge scene's gameOver and cancels the timer that requests the scores.
+   *
+   * @param currentGame the game that has been played
+   */
   @Override
   protected void gameOver(Game currentGame) {
     super.gameOver(currentGame);
@@ -155,6 +194,12 @@ public class MultiPlayerScene extends ChallengeScene {
     requestScores.purge();
   }
 
+  /**
+   * Handles when a key is clicked, the same as the challenge scene but cancels the timer when
+   * Exit is requested.
+   *
+   * @param keyClicked the key that has been clicked
+   */
   @Override
   protected void keyClicked(KeyEvent keyClicked) {
     super.keyClicked(keyClicked);

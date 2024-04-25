@@ -24,7 +24,6 @@ import uk.ac.soton.comp1206.ux.Multimedia;
 
 /**
  * The main menu of the game. Provides a gateway to the rest of the game.
- * TODO add Menu Animations and Visual Effects
  */
 public class MenuScene extends BaseScene {
 
@@ -40,6 +39,11 @@ public class MenuScene extends BaseScene {
     logger.info("Creating Menu Scene");
   }
 
+  /**
+   * Sets up the image to be displayed in the menu scene with transitions.
+   *
+   * @return the image that has been initialised
+   */
   ImageView initialiseImage() {
     Image title = new Image(
         Objects.requireNonNull(getClass().getResourceAsStream("/_images/TetrECS.png")));
@@ -55,6 +59,11 @@ public class MenuScene extends BaseScene {
     return titleView;
   }
 
+  /**
+   * Build the Box that contains all the buttons in the menu scene.
+   *
+   * @return the Box containing all the buttons
+   */
   VBox buildButtonsBox() {
     var play = new Button("Play");
     var multiplayer = new Button("Multiplayer");
@@ -113,7 +122,7 @@ public class MenuScene extends BaseScene {
   }
 
   /**
-   * Handles when the Multiplayer button is triggerred
+   * Handles when the Multiplayer button is triggerred.
    *
    * @param event Event triggered
    */
@@ -123,7 +132,7 @@ public class MenuScene extends BaseScene {
   }
 
   /**
-   * Initialise the menu
+   * Initialises the menu.
    */
   @Override
   public void initialise() {
@@ -132,7 +141,7 @@ public class MenuScene extends BaseScene {
   }
 
   /**
-   * Handle when the Start Game button is triggerred.
+   * Start a Game.
    *
    * @param event event triggerred
    */
@@ -143,7 +152,7 @@ public class MenuScene extends BaseScene {
   }
 
   /**
-   * Handle when the "How To Play" Game button is triggerred.
+   * Opens the instructions window.
    *
    * @param event event triggerred
    */
@@ -153,6 +162,11 @@ public class MenuScene extends BaseScene {
     Multimedia.audio.setOnEndOfMedia(gameWindow::startInstructions);
   }
 
+  /**
+   * Opens the settings.
+   *
+   * @param event event triggerred
+   */
   private void startSettings(MouseEvent event) {
     Multimedia.stopMusic();
     Multimedia.playAudio(Multimedia.clickEffect);
@@ -160,7 +174,7 @@ public class MenuScene extends BaseScene {
   }
 
   /**
-   * Handles when exit is requested.
+   * Exits TetrECS Game.
    *
    * @param event Event triggerred
    */

@@ -113,6 +113,9 @@ public class Grid {
   }
 
   /**
+   * Loops around the block that have been clicked and checks whether the piece given can be played
+   * in that position.
+   *
    * @param x     x-coordinate of the block clicked
    * @param y     y-coordinate of the block clicked
    * @param piece array containing the piece to be inserted
@@ -132,6 +135,9 @@ public class Grid {
   }
 
   /**
+   * Updates the values on the grid to play a piece, loops around the coordinates of the block
+   * clicked and updates the values according to the given Game Piece.
+   *
    * @param x         x-coordinate of the block clicked
    * @param y         y-coordinate of the block clicked
    * @param gamePiece piece to be played

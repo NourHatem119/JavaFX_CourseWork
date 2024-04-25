@@ -49,7 +49,7 @@ public class ChallengeScene extends BaseScene {
 
 
   /**
-   * Create a new Single Player challenge scene
+   * Create a new Single Player challenge scene.
    *
    * @param gameWindow the Game Window
    */
@@ -58,6 +58,12 @@ public class ChallengeScene extends BaseScene {
     logger.info("Creating Challenge Scene");
   }
 
+  /**
+   * Builds the TopBar(HBox) that should be placed in the top of the main pane.
+   *
+   * @param title Type of the game
+   * @return The top bar containing score, type of the game, and lives
+   */
   protected HBox buildTopBar(String title) {
     var scoreValue = new Text();
     var scoreText = new Text("Score");
@@ -86,6 +92,12 @@ public class ChallengeScene extends BaseScene {
     return topBar;
   }
 
+  /**
+   * Builds the sideBar containing the current Local HighScore, the current Level, and the display
+   * for the current and next Pieces.
+   *
+   * @return the sideBar(VBox) that contains all the side components
+   */
   protected VBox buildSideBar() {
     var highScoreText = new Text("HighScore");
     highScoreText.getStyleClass().add("heading");
@@ -120,6 +132,11 @@ public class ChallengeScene extends BaseScene {
     return sideBar;
   }
 
+  /**
+   * Builds the ui timer.
+   *
+   * @return the ui Timer
+   */
   VBox buildBottomBar() {
     timeBar = new Rectangle();
     VBox bottomBar = new VBox(timeBar);
@@ -127,6 +144,20 @@ public class ChallengeScene extends BaseScene {
     timeBar.setHeight(20.0);
     timeBar.setWidth(gameWindow.getWidth());
     return bottomBar;
+  }
+
+  /**
+   * Sets Up the listeners that listen on the game logic and update the ui accordingly.
+   */
+  protected void setUpListeners() {
+    board.setOnBlockClick(this::blockClicked);
+    currentPieceShow.setOnPieceClick(this::pieceClicked);
+    nextPieceShow.setOnPieceClick(this::pieceClicked);
+    game.setOnNextPiece(this::nextPiece);
+    board.setOnRightClicked(this::rightClicked);
+    game.setOnLineCleared(this::lineCleared);
+    game.setGameLoop(this::gameLoop);
+    game.setOnGameOver(this::gameOver);
   }
 
   /**
@@ -171,32 +202,34 @@ public class ChallengeScene extends BaseScene {
       topBar.setSpacing(179);
       mainPane.setTop(topBar);
     }
-    //Handle block on gameboard grid being clicked
-    board.setOnBlockClick(this::blockClicked);
-    currentPieceShow.setOnPieceClick(this::pieceClicked);
-    nextPieceShow.setOnPieceClick(this::pieceClicked);
-    game.setOnNextPiece(this::nextPiece);
-    board.setOnRightClicked(this::rightClicked);
-    game.setOnLineCleared(this::lineCleared);
-    game.setGameLoop(this::gameLoop);
-    game.setOnGameOver(this::gameOver);
+    setUpListeners();
   }
 
-  protected void gameLoop(int i) {
+  /**
+   * Updates the timeBar at the bottom according to the duration generated in the Game Class.
+   *
+   * @param duration duration of one Game Loop
+   */
+  protected void gameLoop(int duration) {
     logger.info("GameLoop Started...");
     Timeline timeBarAnimation = new Timeline(
         new KeyFrame(Duration.ZERO, new KeyValue(timeBar.widthProperty(), gameWindow.getWidth())),
         new KeyFrame(Duration.ZERO, new KeyValue(timeBar.fillProperty(), Color.LIMEGREEN)),
-        new KeyFrame(Duration.millis((double) i / 2), new KeyValue(timeBar.fillProperty(),
+        new KeyFrame(Duration.millis((double) duration / 2), new KeyValue(timeBar.fillProperty(),
             Color.ORANGE)),
-        new KeyFrame(Duration.millis(i), new KeyValue(timeBar.fillProperty(),
+        new KeyFrame(Duration.millis(duration), new KeyValue(timeBar.fillProperty(),
             Color.RED)),
-        new KeyFrame(Duration.millis(i), new KeyValue(timeBar.widthProperty(), 0))
+        new KeyFrame(Duration.millis(duration), new KeyValue(timeBar.widthProperty(), 0))
     );
     timeBarAnimation.setCycleCount(1);
     timeBarAnimation.play();
   }
 
+  /**
+   * Updates the ui when right click is triggered.
+   *
+   * @param event the event triggered by the mouse
+   */
   protected void rightClicked(MouseEvent event) {
     if (event.getButton().equals(MouseButton.SECONDARY)) {
       rotateCurrentPiece(game.getCurrentPiece(), "right");
@@ -245,7 +278,7 @@ public class ChallengeScene extends BaseScene {
   }
 
   /**
-   * Set up the game object and model
+   * Set up the game object and model.
    */
   public void setupGame() {
     logger.info("Starting a new challenge");
@@ -255,7 +288,7 @@ public class ChallengeScene extends BaseScene {
   }
 
   /**
-   * Initialise the scene and start the game
+   * Initialise the scene and start the game.
    */
   @Override
   public void initialise() {
@@ -270,6 +303,11 @@ public class ChallengeScene extends BaseScene {
   }
 
 
+  /**
+   * Handles when a KeyBoard key is clicked.
+   *
+   * @param keyClicked the key that has been clicked
+   */
   @Override
   protected void keyClicked(KeyEvent keyClicked) {
     if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
@@ -300,13 +338,15 @@ public class ChallengeScene extends BaseScene {
         .equals(KeyCode.X)) {
       boolean placed = game.blockClicked(board.getCurrentBlock());
       if (placed) {
-        logger.info("Placed Piece...");
         Multimedia.playAudio(Multimedia.placeEffect);
       }
     }
 
   }
 
+  /**
+   * Updates the ui on pieces swapped.
+   */
   private void swapPieces() {
     Multimedia.playAudio(Multimedia.rotateEffect);
     game.swapPieces();
@@ -314,11 +354,23 @@ public class ChallengeScene extends BaseScene {
     nextPieceShow.showPiece(game.getNextPiece());
   }
 
+  /**
+   * Updates the ui on next piece.
+   *
+   * @param currentPiece new value for current piece
+   * @param nextPiece    new value for next piece
+   */
   protected void nextPiece(GamePiece currentPiece, GamePiece nextPiece) {
     currentPieceShow.showPiece(currentPiece);
     nextPieceShow.showPiece(nextPiece);
   }
 
+  /**
+   * Updates the ui on rotating piece.
+   *
+   * @param currentPiece the piece to be rotated(typically current Piece)
+   * @param direction    direction of rotation
+   */
   private void rotateCurrentPiece(GamePiece currentPiece, String direction) {
     Multimedia.playAudio(Multimedia.rotateEffect);
     game.rotateCurrentPiece(direction);
@@ -326,12 +378,22 @@ public class ChallengeScene extends BaseScene {
     currentPieceShow.showPiece(currentPiece);
   }
 
-  protected void lineCleared(HashSet<GameBlockCoordinate> blocks) {
+  /**
+   * Updates the ui when a line or more is/are cleared.
+   *
+   * @param blocksCoordinates blocksCoordinates of the blocks to clear
+   */
+  protected void lineCleared(HashSet<GameBlockCoordinate> blocksCoordinates) {
     Multimedia.playAudio(Multimedia.lineClearEffect);
-    logger.info("Blocks Coordinates {}", blocks);
-    board.fadeOut(blocks);
+    logger.info("Blocks Coordinates {}", blocksCoordinates);
+    board.fadeOut(blocksCoordinates);
   }
 
+  /**
+   * Ends the game and switch to the scores Scene.
+   *
+   * @param currentGame the game that has been played
+   */
   protected void gameOver(Game currentGame) {
     Multimedia.stopMusic();
     Multimedia.playAudio(Multimedia.gameOverEffect);
@@ -339,6 +401,11 @@ public class ChallengeScene extends BaseScene {
 
   }
 
+  /**
+   * Get the highest Local score to display it.
+   *
+   * @return high score to be beaten
+   */
   private Integer getHighScore() {
     return ScoresScene.getHighScore();
   }

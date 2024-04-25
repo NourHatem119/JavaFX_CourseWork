@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.scene;
 
+import java.util.Objects;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,13 +16,17 @@ import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
+/**
+ * The Instructions Scene, Holds the instructions to follow when playing the game.
+ */
 public class InstructionsScene extends BaseScene {
 
 
   private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
 
   /**
-   * Create a new scene, passing in the GameWindow the scene will be displayed in
+   * Create a new Instructions Scene, passing in the GameWindow the Instructions scene will be
+   * displayed in
    *
    * @param gameWindow the game window
    */
@@ -29,6 +34,9 @@ public class InstructionsScene extends BaseScene {
     super(gameWindow);
   }
 
+  /**
+   * Initialise the Instructions Scene.
+   */
   @Override
   public void initialise() {
     logger.info("Initialising the Instructions Scene");
@@ -36,9 +44,12 @@ public class InstructionsScene extends BaseScene {
     scene.setOnKeyPressed(this::keyClicked);
   }
 
+  /**
+   * Builds the Instructions Scene.
+   */
   @Override
   public void build() {
-    logger.info("Building " + this.getClass().getName());
+    logger.info("Building {}", this.getClass().getName());
 
     root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
@@ -48,32 +59,45 @@ public class InstructionsScene extends BaseScene {
     howToPlayPane.getStyleClass().add("instructions-background");
     var content = new VBox();
     content.setAlignment(Pos.CENTER);
-    howToPlayPane.setTop(content);
+
     var title = new Text("Instructions");
     title.getStyleClass().add("title");
     content.getChildren().add(title);
     var instructionsText = new Text("TetrECS is a fast-paced gravity-free block placement game, "
-        + "where you must survive by clearing rows through careful placement of the upcoming\n"
-        + "blocks before the time runs out. Lose all 3 lives and you're destroyed!");
+        + "where you must survive by clearing rows through careful placement of the");
+    var instructionsTextContinue = new Text(
+        "upcoming blocks before the time runs out. Lose all 3 lives and you're destroyed!");
     instructionsText.getStyleClass().add("instructions");
-    content.getChildren().add(instructionsText);
+    instructionsTextContinue.getStyleClass().add("instructions");
+    content.getChildren().addAll(instructionsText, instructionsTextContinue);
     //Set Up the How to Play Image
     ImageView imageView = new ImageView();
-    Image image = new Image(getClass().getResourceAsStream("/_images/Instructions.png"));
+    Image image = new Image(
+        Objects.requireNonNull(getClass().getResourceAsStream("/_images/Instructions.png")));
     imageView.setImage(image);
     imageView.setPreserveRatio(true);
     imageView.setFitHeight(gameWindow.getHeight() / 1.75);
     imageView.setFitWidth(gameWindow.getWidth() / 1.75);
     content.getChildren().add(imageView);
+
     var pieces = generatePieces();
     var piecesText = new Text();
     piecesText.setText("Pieces");
     piecesText.getStyleClass().add("title");
+
     content.getChildren().add(piecesText);
     content.getChildren().add(pieces);
+
+    howToPlayPane.setTop(content);
     root.getChildren().add(howToPlayPane);
   }
 
+  /**
+   * A for loop that runs through the pieces that can exist in the game and generate a piece view
+   * of each to let the player get familiar with them.
+   *
+   * @return a gridPane containing all the pieces
+   */
   private GridPane generatePieces() {
     var piecesGrid = new GridPane();
     piecesGrid.setAlignment(Pos.CENTER);

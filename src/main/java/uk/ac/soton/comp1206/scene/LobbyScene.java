@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -28,13 +29,20 @@ import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
+/**
+ * LobbyScene is a UI display that allows the player to create or join a game, allows the user to
+ * interact with other users through a chat, and Allows user to start a game(if the host), and
+ * starts the game for the user if started by other players(if not host).
+ */
 public class LobbyScene extends BaseScene {
 
   private static final Logger logger = LogManager.getLogger(LobbyScene.class);
 
   Communicator communicator;
 
-
+  /**
+   * A timer created to request and update the list of channels periodically.
+   */
   Timer timer;
 
   VBox channelChat; //Channel Chat and other relevant components.
@@ -46,15 +54,34 @@ public class LobbyScene extends BaseScene {
   VBox leftPanel; //title, create a game button, and current channels.
   TextFlow users = new TextFlow(); //Current users in the channel.
 
+  /**
+   * A button to start the game.
+   */
   Button startGame;
+  /**
+   * A button to leave the current channel.
+   */
   Button leaveChannel;
 
+  /**
+   * The chat between players in a specific channel.
+   */
   TextFlow chat;
 
+  /**
+   * Title + button to create a channel.
+   */
   Text currentGames;
   Button createChannel;
 
+  /**
+   * Indicates whether user is joined to a channel or not.
+   */
   boolean joined;
+
+  /**
+   * Contains the names for all the channels at the currently.
+   */
   ArrayList<String> channelsNames = new ArrayList<>();
 
   /**
@@ -68,7 +95,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * handles when a message is received from the server.
+   * Handles when a message is received from the server.
    *
    * @param message message received from the Server.
    */
@@ -91,7 +118,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * handles joining when joining/creating a channel.
+   * Handles joining when joining/creating a channel.
    *
    * @param message message received from the Server.
    */
@@ -99,13 +126,13 @@ public class LobbyScene extends BaseScene {
     String[] messageParts = message.split(" ");
     if (!joined) {
       Multimedia.playAudio(Multimedia.notification);
-      showChannelChat(messageParts[1]);
+      buildChannelChat(messageParts[1]);
       joined = true;
     }
   }
 
   /**
-   * Handles when an error happens.
+   * Handles when an Error happens.
    *
    * @param message message received from the Server.
    */
@@ -117,7 +144,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Handles Sending a message through the ui.
+   * Handles Showing a message sent/received through the ui.
    *
    * @param s message received from the Server.
    */
@@ -133,7 +160,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Handles adding the usernames of the current users to the ui.
+   * Handles adding the usernames of the current users joined to the current Channel to the ui.
    *
    * @param message message received from the Server.
    */
@@ -141,12 +168,12 @@ public class LobbyScene extends BaseScene {
     this.users.getChildren().clear();
     String[] users = message.replace("USERS ", "").split("\n");
     for (String user : users) {
-      this.users.getChildren().add(new Text(user));
+      this.users.getChildren().add(new Text(" " + user));
     }
   }
 
   /**
-   * Handles adding the channels to the ui.
+   * Handles adding all the currently existing channels to the ui.
    *
    * @param message message received from the Server.
    */
@@ -161,7 +188,7 @@ public class LobbyScene extends BaseScene {
       joinChannel.setOnMouseClicked(e -> {
         joinChannel(channel);
         if (!joined) {
-          showChannelChat(channel);
+          buildChannelChat(channel);
         }
         host.set(message.contains("HOST"));
       });
@@ -209,7 +236,7 @@ public class LobbyScene extends BaseScene {
         if (key.getCode().equals(KeyCode.ENTER)) {
           createChannel(newChannelName.getText());
           if (!joined && !channelsNames.contains(newChannelName.getText())) {
-            showChannelChat(newChannelName.getText());
+            buildChannelChat(newChannelName.getText());
           }
           leftPanel.getChildren().remove(newChannelName);
         }
@@ -225,11 +252,12 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Builds the whole ui display of the channel chat and other relevant components.
+   * Builds the basic ui display of the channel chat.
    */
-  void buildChannelChat() {
+  void initialiseChannelChat() {
     channelChat = new VBox();
     channelChat.setSpacing(10);
+    channelChat.setAlignment(Pos.CENTER);
     channelChat.setMaxWidth(gameWindow.getWidth() / 2.0);
 
     startGame = new Button("Start");
@@ -256,7 +284,7 @@ public class LobbyScene extends BaseScene {
     root.getChildren().add(lobbyPane);
 
     buildLeftPanel();
-    buildChannelChat();
+    initialiseChannelChat();
 
     lobbyPane.setRight(channelChat);
     lobbyPane.setLeft(leftPanel);
@@ -277,7 +305,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * handles when a key is clicked in the presence of the chat Box.
+   * Handles when a key is clicked in the presence of the chat Box.
    *
    * @param chatBox The chatBox that the event happened in its presence
    * @param e       the Event that happened in the presence of the chatBox
@@ -308,7 +336,7 @@ public class LobbyScene extends BaseScene {
    *
    * @param nameOfChannel The name of the channel Joined/Created
    */
-  private void showChannelChat(String nameOfChannel) {
+  private void buildChannelChat(String nameOfChannel) {
 
     var channelName = new Text(nameOfChannel);
     channelName.getStyleClass().add("title");
@@ -342,13 +370,13 @@ public class LobbyScene extends BaseScene {
 
     var howToChat = new Text(
         """
-                       
-            Welcome to the lobby\s
-            Type /nick to change nickname\s
-            Type /part to quit the channel\s
-            Type /start to start the game
-                       
-            """);
+                        \s
+             Welcome to the lobby\s
+             Type /nick to change nickname\s
+             Type /part to quit the channel\s
+             Type /start to start the game
+                        \s
+            \s""");
 
     chat.getChildren().add(howToChat);
 
@@ -358,7 +386,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Allows the player to join a channel.
+   * Sends a message to the server to allow the user to join the specified channel.
    *
    * @param channelName The name of the channel to be joined
    */
@@ -367,7 +395,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Allows the Player to create a channel.
+   * Sends a message to the server telling it that the current player has created a channel.
    *
    * @param channelName The name of the channel to be created
    */
@@ -376,7 +404,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Allows the Player to leave the channel.
+   * Sends a message to the communicator telling it that the player has left the current channel.
    */
   private void leaveChannel() {
     communicator.send("PART");
@@ -389,7 +417,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * starts the game and stops the timer requesting the channels.
+   * Starts the game and stops the timer requesting the channels.
    */
   protected void startGame() {
     Multimedia.stopMusic();
@@ -399,7 +427,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * handles when a key is casually clicked
+   * Handles when a key is clicked when the focus is on the scene.
    *
    * @param keyClicked The Key that has been clicked
    */
