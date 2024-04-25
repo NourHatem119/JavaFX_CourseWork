@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.scene;
 
+import java.util.Objects;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.RotateTransition;
@@ -28,7 +29,7 @@ public class OpeningScene extends BaseScene {
 
   @Override
   public void initialise() {
-    Multimedia.playBackGroundMusic(Multimedia.opening);
+    Multimedia.playAudio(Multimedia.opening);
     scene.setOnKeyPressed(this::skip);
   }
 
@@ -41,7 +42,8 @@ public class OpeningScene extends BaseScene {
     openingPane.getStyleClass().add("intro");
     root.getChildren().add(openingPane);
     ImageView opening = new ImageView(
-        new Image(getClass().getResourceAsStream("/_images/ECSGames.png")));
+        new Image(Objects.requireNonNull(getClass().
+            getResourceAsStream("/_images/ECSGames.png"))));
     opening.setPreserveRatio(true);
     opening.setFitWidth(400);
     openingPane.getChildren().add(opening);
@@ -55,7 +57,6 @@ public class OpeningScene extends BaseScene {
     sequential = new SequentialTransition(new Animation[]{(Animation) rotation, (Animation) fade});
     sequential.play();
     sequential.setOnFinished(e -> {
-      Multimedia.stopMusic();
       gameWindow.startMenu();
     });
   }
@@ -63,6 +64,5 @@ public class OpeningScene extends BaseScene {
   public void skip(KeyEvent anyKey) {
     gameWindow.startMenu();
     sequential.stop();
-    Multimedia.stopMusic();
   }
 }

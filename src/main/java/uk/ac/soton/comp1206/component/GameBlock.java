@@ -153,8 +153,8 @@ public class GameBlock extends Canvas {
     //Colour fill
     gc.setFill(colour);
     gc.fillRect(0, 0, width, height);
-    gc.strokeRoundRect(0, 0, width, height,30,30);
-    gc.strokeRoundRect(0, 0, width, height,120,120);
+    gc.strokeRoundRect(0, 0, width, height, 30, 30);
+    gc.strokeRoundRect(0, 0, width, height, 120, 120);
 
     //Border
     gc.setStroke(Color.BLACK);

@@ -93,8 +93,8 @@ public class InstructionsScene extends BaseScene {
   }
 
   /**
-   * A for loop that runs through the pieces that can exist in the game and generate a piece view
-   * of each to let the player get familiar with them.
+   * A for loop that runs through the pieces that can exist in the game and generate a piece view of
+   * each to let the player get familiar with them.
    *
    * @return a gridPane containing all the pieces
    */

@@ -59,6 +59,7 @@ public class Game {
    * The multiplier property.
    */
   private final IntegerProperty multiplier = new SimpleIntegerProperty(1);
+  private final ScheduledExecutorService executor;
   /**
    * NextPiece Listener to listen when next piece and update the ui.
    */
@@ -85,7 +86,6 @@ public class Game {
   protected GamePiece nextPiece;
   ScheduledFuture<?> futureTask;
   private Timer timer;
-  private final ScheduledExecutorService executor;
 
   /**
    * Create a new game with the specified rows and columns. Creates a corresponding grid model.

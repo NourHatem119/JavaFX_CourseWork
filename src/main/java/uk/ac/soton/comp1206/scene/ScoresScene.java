@@ -39,17 +39,16 @@ public class ScoresScene extends BaseScene {
   private static final Logger logger = LogManager.getLogger(ScoresScene.class);
   static File scoresFile = new File("D:\\Uni\\"
       + "P_II\\Coursework\\coursework\\scores.txt");
-  BorderPane mainPane = new BorderPane();
-  Communicator communicator;
+  //  ArrayList<Pair<String, Integer>> remoteScoresList = new ArrayList<>();
+  private final ObservableList<Pair<String, Integer>> remoteScores =
+      FXCollections.observableList(new ArrayList<>());
   /**
    * Creates the local List of scores, and the online list of scores.
    */
-  ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
   public SimpleListProperty<Pair<String, Integer>> localScores =
-      new SimpleListProperty<>(FXCollections.observableArrayList(scores));
-  ArrayList<Pair<String, Integer>> remoteScoresList = new ArrayList<>();
-  private ObservableList<Pair<String, Integer>> remoteScores;
-
+      new SimpleListProperty<>(loadScores(scoresFile));
+  BorderPane mainPane = new BorderPane();
+  Communicator communicator;
   Game game;
 
   /**
@@ -71,7 +70,7 @@ public class ScoresScene extends BaseScene {
 //    Multimedia.playAudio(Multimedia.challengeMusic);
   }
 
-  private static ArrayList<Pair<String, Integer>> loadScores(File file) {
+  private static ObservableList<Pair<String, Integer>> loadScores(File file) {
     if (!file.exists()) {
       try {
         boolean created = file.createNewFile();
@@ -84,7 +83,7 @@ public class ScoresScene extends BaseScene {
         throw new RuntimeException(e);
       }
     }
-    ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
+    ObservableList<Pair<String, Integer>> scores = FXCollections.observableList(new ArrayList<>());
     try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
       String line;
       while ((line = reader.readLine()) != null) {
@@ -103,7 +102,7 @@ public class ScoresScene extends BaseScene {
   }
 
   public static Integer getHighScore() {
-    ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
+    ObservableList<Pair<String, Integer>> scores = loadScores(scoresFile);
     if (!scores.isEmpty()) {
       return scores.get(0).getValue();
     } else {
@@ -137,7 +136,7 @@ public class ScoresScene extends BaseScene {
     switch (type) {
       case "Online Scores" -> {
         onlineScoresList = new ScoresList();
-        remoteScores = FXCollections.observableArrayList(remoteScoresList);
+//        remoteScores = FXCollections.observableArrayList(remoteScoresList);
         SimpleListProperty<Pair<String, Integer>> wrap = new SimpleListProperty<>(remoteScores);
         onlineScoresList.listProperty().bind(wrap);
         onlineScoresList.setAlignment(Pos.CENTER);
@@ -235,6 +234,8 @@ public class ScoresScene extends BaseScene {
 
         mainPane.setCenter(addLocalHighScore);
 
+      } else {
+        mainPane.setCenter(scoresContainer);
       }
     } else {
       mainPane.setCenter(scoresContainer);
@@ -243,6 +244,12 @@ public class ScoresScene extends BaseScene {
     scoresPane.getChildren().add(mainPane);
   }
 
+  /**
+   * Checks if a highScore is obtained, and returns the index where it should be inserted, and
+   * otherwise -1.
+   *
+   * @return the index where the highScore should be inserted
+   */
   private int highScoreIndexLocal() {
     for (int i = 0; i < localScores.getSize(); i++) {
       if (newScore > localScores.get(i).getValue()) {
@@ -252,10 +259,18 @@ public class ScoresScene extends BaseScene {
     return -1;
   }
 
+  /**
+   * Requests Online HighScores.
+   */
   private void loadOnlineScores() {
     communicator.send("HISCORES");
   }
 
+  /**
+   * Handle the receiving of Online HighScores.
+   *
+   * @param s message received from the server
+   */
   private void receiveHighScores(String s) {
     String[] message = s.split(" ", 2);
     String receivedScores = "";
@@ -264,13 +279,12 @@ public class ScoresScene extends BaseScene {
     }
 
     String[] scores = receivedScores.split("\n");
+    remoteScores.clear();
     for (String sc : scores) {
       String[] score = sc.split(":");
-      remoteScoresList.add(new Pair<>(score[0], Integer.parseInt(score[1])));
+      remoteScores.add(new Pair<>(score[0], Integer.parseInt(score[1])));
     }
-    remoteScoresList.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-    remoteScores.clear();
-    remoteScores.addAll(remoteScoresList);
+    remoteScores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
   }
 
   private void writeScores(File file) {
@@ -283,6 +297,12 @@ public class ScoresScene extends BaseScene {
     }
   }
 
+  /**
+   * Sends a message to the server with a new HighScore if a new highScore is obtained.
+   *
+   * @param nameForNewScore name of the player obtained that score
+   * @param newScore        the new HighScore
+   */
   private void writeOnlineScore(String nameForNewScore, int newScore) {
     communicator.send("HISCORE " + nameForNewScore + ":" + newScore);
   }

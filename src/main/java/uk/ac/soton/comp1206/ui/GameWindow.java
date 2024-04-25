@@ -129,7 +129,6 @@ public class GameWindow {
   }
 
 
-
   /**
    * Setup the default settings for the stage itself (the window), such as the title and minimum
    * width and height.

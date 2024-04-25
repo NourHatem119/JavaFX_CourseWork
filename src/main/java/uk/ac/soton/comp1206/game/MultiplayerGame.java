@@ -45,7 +45,10 @@ public class MultiplayerGame extends Game {
     }
   }
 
-  /**
+  @Override
+  public void initialiseGame() {
+    Platform.runLater(spawnThread);
+  }  /**
    * Called in initialise to fetch the first 2 pieces and show them thread safely because linked
    * lists are not thread safe.
    */
@@ -69,11 +72,6 @@ public class MultiplayerGame extends Game {
     }
   };
 
-  @Override
-  public void initialiseGame() {
-    Platform.runLater(spawnThread);
-  }
-
   /**
    * Receives the message containing the requested piece from the server and creates a new piece
    * object with this message, and adds it synchronously.
@@ -91,7 +89,7 @@ public class MultiplayerGame extends Game {
     logger.info("Piece Added ... {}/({})", piece.toString(), pieceNo + 1);
     String queueContents = "";
     for (GamePiece gamePiece : pieces) {
-       queueContents = "Queue Contains [";
+      queueContents = "Queue Contains [";
       queueContents += gamePiece.toString() + "(" + gamePiece.getValue() + ")";
     }
     logger.info(queueContents);
@@ -107,8 +105,8 @@ public class MultiplayerGame extends Game {
   }
 
   /**
-   * Gets the next piece in the queue(Linked List), sends a message to the communicator to
-   * replace it.
+   * Gets the next piece in the queue(Linked List), sends a message to the communicator to replace
+   * it.
    *
    * @return the game piece received from the communicator
    */
@@ -142,6 +140,7 @@ public class MultiplayerGame extends Game {
   /**
    * Updates the score according to the lines cleared and blocks cleared, sends a message to the
    * communicator telling it the updated score.
+   *
    * @param numberOfLines  number of lines cleared
    * @param numberOfBlocks number of blocks cleared
    */
@@ -152,14 +151,16 @@ public class MultiplayerGame extends Game {
   }
 
   /**
-   * Ends the game and sends a message to the communicator indicating that the game has been
-   * ended for the current player.
+   * Ends the game and sends a message to the communicator indicating that the game has been ended
+   * for the current player.
    */
   @Override
   public void endGame() {
     super.endGame();
     communicator.send("DIE");
   }
+
+
 
 
 }

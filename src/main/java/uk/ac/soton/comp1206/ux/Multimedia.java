@@ -3,7 +3,6 @@ package uk.ac.soton.comp1206.ux;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,9 +11,8 @@ import javafx.scene.media.MediaPlayer;
 
 public class Multimedia {
 
-
-  private static final String path = "d:\\Uni\\P_II\\Coursework\\coursework\\src\\main"
-      + "\\resources";
+  //
+  private static final String path = System.getProperty("user.dir") + "\\src\\main\\resources";
 
   public static final Media settingsMusic =
       new Media(new File(path + "\\music\\settings.mp3").toURI().toString());
@@ -43,18 +41,33 @@ public class Multimedia {
   public static final Media exitEffect =
       new Media(new File(path + "\\sounds\\Exit.wav").toURI().toString());
   public static final Media opening =
-      new Media(new File(path + "\\music\\gameStart.wav").toURI().toString());
+      new Media(new File(path + "\\sounds\\gameStart.wav").toURI().toString());
 
+  /**
+   * The file Containing the audio settings.
+   */
   private static final File config = new File("config.txt");
+  /**
+   * The MediaPlayer that runs sound effects.
+   */
   public static MediaPlayer audio;
+  /**
+   * The MediaPlayer that runs backgroundMusic.
+   */
   private static MediaPlayer Music;
-
-  private static Double volume = getVolume();
 
   public static MediaPlayer getMusic() {
     return Music;
-  }
+  }  /**
+   * The volume.
+   */
+  private static Double volume = getVolume();
 
+  /**
+   * Plays the given audio on request just for one time.
+   *
+   * @param sound audio to be played
+   */
   static public void playAudio(Media sound) {
     audio = new MediaPlayer(sound);
     audio.setCycleCount(1);
@@ -62,19 +75,33 @@ public class Multimedia {
     audio.setVolume(volume + 0.3);
   }
 
+  /**
+   * Plays and loops the backGroundMusic until stop is requested.
+   *
+   * @param music music to be played
+   */
   static public void playBackGroundMusic(Media music) {
-    if (Music != null)
+    if (Music != null) {
       Music.stop();
+    }
     Music = new MediaPlayer(music);
     Music.play();
     Music.setCycleCount(MediaPlayer.INDEFINITE);
     Music.setVolume(volume);
   }
 
+  /**
+   * Stops the backGroundMusic that is being run now.
+   */
   public static void stopMusic() {
     Music.stop();
   }
 
+  /**
+   * Get the volume from the config file.
+   *
+   * @return volume
+   */
   public static double getVolume() {
     if (!config.exists()) {
       try {
@@ -94,6 +121,12 @@ public class Multimedia {
     return volume;
   }
 
+  /**
+   * Sets the volume and writes it into the config file. Will Only ever be used in the settings
+   * Scene.
+   *
+   * @param newVolume updated value for the volume
+   */
   public static void setVolume(double newVolume) {
     volume = newVolume > 0 ? newVolume : volume;
     if (newVolume > 0) {
@@ -104,4 +137,6 @@ public class Multimedia {
       }
     }
   }
+
+
 }

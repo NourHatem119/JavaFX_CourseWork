@@ -36,17 +36,17 @@
 }
 
 .challenge-background {
-  -fx-background-image: url("../_images/challenge-background1.jpg");
+  -fx-background-image: url("../_images/challenge-background.jpg");
   -fx-background-size: cover;
 }
 
-.scores-background {
-  -fx-background-image: url("../_images/GameOver.jpg");
-  -fx-background-size: cover;
-}
-
-.settings {
+.settings .scores-background{
   -fx-background-image: url("../_images/settings.jpg");
+  -fx-background-size: cover;
+}
+
+.instructions-background {
+  -fx-background-image: url("../_images/instructions-background.jpg");
   -fx-background-size: cover;
 }
 
@@ -104,8 +104,20 @@
 
 .score {
   -fx-fill: yellow;
+  -fx-background-color: transparent;
   -fx-font-family: 'Orbitron';
   -fx-font-size: 32px;
+  -fx-font-weight: 700;
+  -fx-border-color: black;
+  -fx-stroke: black;
+  -fx-text-alignment: center;
+  -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+
+.scoreName {
+  -fx-background-color: transparent;
+  -fx-font-family: 'Orbitron';
+  -fx-font-size: 26px;
   -fx-font-weight: 700;
   -fx-border-color: black;
   -fx-stroke: black;

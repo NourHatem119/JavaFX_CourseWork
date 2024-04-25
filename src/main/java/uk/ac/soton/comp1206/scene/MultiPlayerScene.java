@@ -195,8 +195,8 @@ public class MultiPlayerScene extends ChallengeScene {
   }
 
   /**
-   * Handles when a key is clicked, the same as the challenge scene but cancels the timer when
-   * Exit is requested.
+   * Handles when a key is clicked, the same as the challenge scene but cancels the timer when Exit
+   * is requested.
    *
    * @param keyClicked the key that has been clicked
    */
