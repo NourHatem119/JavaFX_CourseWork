@@ -107,7 +107,7 @@ public class Multimedia {
       try {
         config.createNewFile();
         BufferedWriter out = new BufferedWriter(new FileWriter(config));
-        out.write(String.valueOf(volume));
+        out.write(String.valueOf(0.5));
       } catch (IOException e) {
         throw new RuntimeException(e);
       }
