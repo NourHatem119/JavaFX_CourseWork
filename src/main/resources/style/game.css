@@ -40,7 +40,7 @@
   -fx-background-size: cover;
 }
 
-.settings .scores-background{
+.settings {
   -fx-background-image: url("../_images/settings.jpg");
   -fx-background-size: cover;
 }
