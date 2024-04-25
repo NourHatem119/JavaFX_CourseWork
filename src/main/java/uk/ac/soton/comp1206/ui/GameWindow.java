@@ -60,7 +60,8 @@ public class GameWindow {
         communicator = new Communicator("ws://ofb-labs.soton.ac.uk:9700");
 
         //Go to menu
-        startMenu();
+//        startMenu();
+        startOpening();
     }
 
     /**
@@ -75,6 +76,7 @@ public class GameWindow {
         Font.loadFont(getClass().getResourceAsStream("/style/Orbitron-ExtraBold.ttf"),32);
     }
 
+    public void startOpening() { loadScene(new OpeningScene(this));}
     /**
      * Display the main menu
      */

@@ -6,7 +6,7 @@ import javafx.scene.media.MediaPlayer;
 
 public class Multimedia {
 
-  private static MediaPlayer audio;
+  public static MediaPlayer audio;
   private static MediaPlayer Music;
 
   private static final String path = "d:\\Uni\\P_II\\Coursework\\coursework\\src\\main"
@@ -30,6 +30,13 @@ public class Multimedia {
       new Media(new File(path + "\\sounds\\lifelose.wav").toURI().toString());
   public static final Media notification =
       new Media(new File(path + "\\sounds\\message.wav").toURI().toString());
+  public static final Media clickEffect =
+      new Media(new File(path + "\\sounds\\click.wav").toURI().toString());
+  public static final Media exitEffect =
+      new Media(new File(path + "\\sounds\\Exit.wav").toURI().toString());
+  public static final Media opening =
+      new Media(new File(path + "\\music\\gameStart.wav").toURI().toString());
+
 
   static public void playAudio(Media sound) {
     audio = new MediaPlayer(sound);
@@ -41,6 +48,7 @@ public class Multimedia {
     Music = new MediaPlayer(music);
     Music.play();
     Music.setCycleCount(MediaPlayer.INDEFINITE);
+    Music.setVolume(0.25);
   }
   public static void stopMusic() {
     Music.stop();

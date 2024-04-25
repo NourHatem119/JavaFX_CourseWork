@@ -6,6 +6,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.util.Pair;
@@ -43,7 +44,7 @@ public class ScoresList extends VBox {
       transition.setFromValue(0.0);
       transition.setToValue(1.0);
       transitions[index] = transition;
-      score.setFill(GameBlock.COLOURS[index + 1]);
+      score.setFill(Color.BLACK);
       getChildren().add(score);
       index++;
     }

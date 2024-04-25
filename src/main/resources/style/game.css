@@ -6,13 +6,25 @@
   -fx-background-color: black;
 }
 
+.button{
+  -fx-background-color: transparent;
+  -fx-text-fill: White;
+  -fx-font-family: 'YouMurderer BB';
+  -fx-font-size: 45;
+}
+
 .menu-background {
-  -fx-background-image: url("../_images/1.jpg");
+  -fx-background-image: url("../_images/menu-background.jpg");
   -fx-background-size: cover;
 }
 
 .challenge-background {
-  -fx-background-image: url("../_images/2.jpg");
+  -fx-background-image: url("../_images/challenge-background.jpg");
+  -fx-background-size: cover;
+}
+
+.scores-background {
+  -fx-background-image: url("../_images/GameOver.jpg");
   -fx-background-size: cover;
 }
 
@@ -129,7 +141,7 @@
 }
 
 .scoreitem {
-  -fx-font-size: 20px;
+  -fx-font-size: 23px;
   -fx-font-weight: 700;
 }
 

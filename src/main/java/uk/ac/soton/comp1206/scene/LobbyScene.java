@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -155,7 +156,7 @@ public class LobbyScene extends BaseScene {
     channelsNames.addAll(List.of(channels));
     for (String channel : channels) {
       var channelName = new Text(channel + "\n");
-      channelName.getStyleClass().add("title");
+      channelName.getStyleClass().add("heading");
       channelName.setOnMouseClicked(e -> {
         joinChannel(channel);
         if (!joined) {
@@ -198,6 +199,7 @@ public class LobbyScene extends BaseScene {
       var newChannelName = new TextField();
       newChannelName.setPromptText("Enter channel name");
       leftPanel.getChildren().add(newChannelName);
+
       leftPanel.getChildren().add(channels);
       newChannelName.setOnKeyPressed(key -> {
         if (key.getCode().equals(KeyCode.ENTER)) {
@@ -211,6 +213,9 @@ public class LobbyScene extends BaseScene {
     });
 
     channels = new TextFlow();
+    channels.setLineSpacing(15);
+    channels.setPadding(new Insets(25, channels.getPadding().getRight(),
+        channels.getPadding().getBottom(), channels.getPadding().getLeft()));
 
     leftPanel.getChildren().addAll(currentGames, createChannel, channels);
   }
@@ -329,7 +334,7 @@ public class LobbyScene extends BaseScene {
     channelChat.getChildren().add(chatBox);
     HBox buttons = new HBox(startGame, leaveChannel);
     startGame.visibleProperty().bind(host);
-    buttons.setSpacing(10);
+    buttons.setSpacing(50);
     channelChat.getChildren().add(buttons);
 
     var howToChat = new Text(

@@ -8,6 +8,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
+import javafx.animation.FadeTransition;
+import javafx.animation.FillTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -15,11 +18,14 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,6 +66,7 @@ public class ScoresScene extends BaseScene {
     newScore = game.getScore();
     communicator = window.getCommunicator();
     currentGameList = currentScores;
+
 //    Multimedia.playAudio(Multimedia.challengeMusic);
   }
 
@@ -175,7 +182,7 @@ public class ScoresScene extends BaseScene {
     var scoresPane = new StackPane();
     scoresPane.setMaxWidth(gameWindow.getWidth());
     scoresPane.setMaxHeight(gameWindow.getHeight());
-    scoresPane.getStyleClass().add("menu-background");
+    scoresPane.getStyleClass().add("scores-background");
     root.getChildren().add(scoresPane);
 
 
@@ -186,15 +193,11 @@ public class ScoresScene extends BaseScene {
     scoresContainer.setAlignment(Pos.CENTER);
 
 
-    var gameoverText = new Text("GAMEOVER");
-    gameoverText.getStyleClass().add("bigtitle");
-
-
     var highScoresText = new Text("HIGHSCORES");
     highScoresText.getStyleClass().add("bigtitle");
 
 
-    scoresContainer.getChildren().addAll(gameoverText, highScoresText, buildScoresBox());
+    scoresContainer.getChildren().addAll(highScoresText, buildScoresBox());
 
     mainPane.setCenter(scoresContainer);
 
