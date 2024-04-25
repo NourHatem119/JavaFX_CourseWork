@@ -4,5 +4,5 @@ import javafx.scene.input.MouseEvent;
 
 public interface RightClickedListener {
 
-  public void rightClicked (MouseEvent rightClick);
+  public void rightClicked(MouseEvent rightClick);
 }

@@ -11,6 +11,17 @@ public class PieceBoard extends GameBoard {
   private static final Logger logger = LogManager.getLogger(PieceBoard.class);
 
   BlockClickedListener pieceClickedListener;
+  private boolean isCurrentPiece = false;
+
+  /**
+   * Creates the Board for the piece.
+   *
+   * @param width  the width of the board
+   * @param height the height of the board
+   */
+  public PieceBoard(double width, double height) {
+    super(3, 3, width, height);
+  }
 
   public boolean isCurrentPiece() {
     return isCurrentPiece;
@@ -23,19 +34,8 @@ public class PieceBoard extends GameBoard {
   /**
    * Paints the circle.
    */
-  public void showCircle(){
+  public void showCircle() {
     blocks[1][1].paintCircle();
-  }
-
-  private boolean isCurrentPiece = false;
-  /**
-   * Creates the Board for the piece.
-   *
-   * @param width the width of the board
-   * @param height the height of the board
-   */
-  public PieceBoard(double width, double height) {
-    super(3, 3, width, height);
   }
 
   /**
@@ -43,9 +43,9 @@ public class PieceBoard extends GameBoard {
    *
    * @param gamePiece the piece to be shown
    */
-  public void showPiece(GamePiece gamePiece){
+  public void showPiece(GamePiece gamePiece) {
     this.grid.clean();
-    this.grid.playPiece(1,1, gamePiece);
+    this.grid.playPiece(1, 1, gamePiece);
     if (isCurrentPiece) {
       showCircle();
     }
@@ -65,13 +65,13 @@ public class PieceBoard extends GameBoard {
     GameBlock block = new GameBlock(this, x, y, blockWidth, blockHeight);
 
     //Add to the GridPane
-    add(block,x,y);
+    add(block, x, y);
 
     //Add to our block directory
     blocks[x][y] = block;
 
     //Link the GameBlock component to the corresponding value in the Grid
-    block.bind(grid.getGridProperty(x,y));
+    block.bind(grid.getGridProperty(x, y));
 
     //Add a mouse click handler to the block to trigger GameBoard blockClicked method
     block.setOnMouseClicked((e) -> blockClicked(e, block));
@@ -81,6 +81,7 @@ public class PieceBoard extends GameBoard {
 
   /**
    * Set the listener to handle an event when a piece is clicked.
+   *
    * @param listener listener to add
    */
   public void setOnPieceClick(BlockClickedListener listener) {
@@ -89,13 +90,14 @@ public class PieceBoard extends GameBoard {
 
   /**
    * Triggered when a block is clicked. Call the attached listener.
+   *
    * @param event mouse event
    * @param block block clicked on
    */
   private void blockClicked(MouseEvent event, GameBlock block) {
     logger.info("Block clicked: {}", block);
 
-    if(pieceClickedListener != null) {
+    if (pieceClickedListener != null) {
       pieceClickedListener.blockClicked(block, event);
     }
   }

@@ -121,11 +121,11 @@ public class Grid {
   public boolean canPlayPiece(int x, int y, GamePiece piece) {
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-          if (piece.getBlocks()[i][j] > 0) {
-              if (get(x - 1 + i, y - 1 + j) != 0) {
-                  return false;
-              }
+        if (piece.getBlocks()[i][j] > 0) {
+          if (get(x - 1 + i, y - 1 + j) != 0) {
+            return false;
           }
+        }
       }
     }
     return true;
@@ -140,9 +140,9 @@ public class Grid {
     int[][] blocks = gamePiece.getBlocks();
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-          if (blocks[i][j] > 0) {
-              set(x - 1 + i, y - 1 + j, gamePiece.getValue());
-          }
+        if (blocks[i][j] > 0) {
+          set(x - 1 + i, y - 1 + j, gamePiece.getValue());
+        }
       }
     }
   }
@@ -152,9 +152,9 @@ public class Grid {
    */
   public void clean() {
     for (int x = 0; x < this.cols; x++) {
-        for (int y = 0; y < this.rows; y++) {
-            this.grid[x][y].set(0);
-        }
+      for (int y = 0; y < this.rows; y++) {
+        this.grid[x][y].set(0);
+      }
     }
   }
 

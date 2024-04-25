@@ -4,10 +4,7 @@ package uk.ac.soton.comp1206.game;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -47,83 +44,19 @@ public class Game {
    * The grid model linked to the game
    */
   protected final Grid grid;
-
-  private Timer timer;
-
-  private ScheduledExecutorService executor;
-  ScheduledFuture<?> futureTask;
-
-  public GamePiece getCurrentPiece() {
-    return currentPiece;
-  }
-
-  protected GamePiece currentPiece;
-
-  public GamePiece getNextPiece() {
-    return nextPiece;
-  }
-
-  protected GamePiece nextPiece;
-  public NextPieceListener nextPieceListener;
-
-  public LineClearedListener lineClearedListener;
-
-  public GameLoopListener gameLoopListener;
-  public GameOverListener gameOverListener;
-
-  public int getScore() {
-    return score.get();
-  }
-
-  public IntegerProperty scoreProperty() {
-    return score;
-  }
-
-  public void setScore(int score) {
-    this.score.set(score);
-  }
-
-  public int getLevel() {
-    return level.get();
-  }
-
-  public IntegerProperty levelProperty() {
-    return level;
-  }
-
-  public void setLevel(int level) {
-    this.level.set(level);
-  }
-
-  public int getLives() {
-    return lives.get();
-  }
-
-  public IntegerProperty livesProperty() {
-    return lives;
-  }
-
-  public void setLives(int lives) {
-    this.lives.set(lives);
-  }
-
-  public int getMultiplier() {
-    return multiplier.get();
-  }
-
-  public IntegerProperty multiplierProperty() {
-    return multiplier;
-  }
-
-  public void setMultiplier(int multiplier) {
-    this.multiplier.set(multiplier);
-  }
-
   private final IntegerProperty score = new SimpleIntegerProperty(0);
-
   private final IntegerProperty level = new SimpleIntegerProperty(0);
   private final IntegerProperty lives = new SimpleIntegerProperty(3);
   private final IntegerProperty multiplier = new SimpleIntegerProperty(1);
+  public NextPieceListener nextPieceListener;
+  public LineClearedListener lineClearedListener;
+  public GameLoopListener gameLoopListener;
+  public GameOverListener gameOverListener;
+  protected GamePiece currentPiece;
+  protected GamePiece nextPiece;
+  ScheduledFuture<?> futureTask;
+  private Timer timer;
+  private ScheduledExecutorService executor;
 
   /**
    * Create a new game with the specified rows and columns. Creates a corresponding grid model.
@@ -138,6 +71,62 @@ public class Game {
     //Create a new grid model to represent the game state
     this.grid = new Grid(cols, rows);
     executor = Executors.newSingleThreadScheduledExecutor();
+  }
+
+  public GamePiece getCurrentPiece() {
+    return currentPiece;
+  }
+
+  public GamePiece getNextPiece() {
+    return nextPiece;
+  }
+
+  public int getScore() {
+    return score.get();
+  }
+
+  public void setScore(int score) {
+    this.score.set(score);
+  }
+
+  public IntegerProperty scoreProperty() {
+    return score;
+  }
+
+  public int getLevel() {
+    return level.get();
+  }
+
+  public void setLevel(int level) {
+    this.level.set(level);
+  }
+
+  public IntegerProperty levelProperty() {
+    return level;
+  }
+
+  public int getLives() {
+    return lives.get();
+  }
+
+  public void setLives(int lives) {
+    this.lives.set(lives);
+  }
+
+  public IntegerProperty livesProperty() {
+    return lives;
+  }
+
+  public int getMultiplier() {
+    return multiplier.get();
+  }
+
+  public void setMultiplier(int multiplier) {
+    this.multiplier.set(multiplier);
+  }
+
+  public IntegerProperty multiplierProperty() {
+    return multiplier;
   }
 
   /**
@@ -338,8 +327,8 @@ public class Game {
   }
 
   public int getTimerDelay() {
-    return Math.max(2500, 12000 - 500 * getLevel());
-//    return 500;
+//    return Math.max(2500, 12000 - 500 * getLevel());
+    return Integer.MAX_VALUE;
   }
 
   public void setGameLoop(GameLoopListener listener) {
@@ -354,6 +343,9 @@ public class Game {
         Platform.runLater(() -> gameOverListener.gameOver(this));
       }
     } else {
+      if (this instanceof MultiplayerGame) {
+        ((MultiplayerGame) this).communicator.send("LIVES " + getLives());
+      }
       Multimedia.playAudio(Multimedia.lifeLostEffect);
       setLives(getLives() - 1);
       nextPiece();

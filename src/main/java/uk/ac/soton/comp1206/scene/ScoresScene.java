@@ -8,9 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
-import javafx.animation.FadeTransition;
-import javafx.animation.FillTransition;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -18,14 +15,11 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,18 +32,14 @@ import uk.ac.soton.comp1206.ux.Multimedia;
 
 public class ScoresScene extends BaseScene {
 
-  BorderPane mainPane = new BorderPane();
-  Communicator communicator;
-
+  private static final Logger logger = LogManager.getLogger(ScoresScene.class);
   static File scoresFile = new File("D:\\Uni\\"
       + "P_II\\Coursework\\coursework\\scores.txt");
-
+  BorderPane mainPane = new BorderPane();
+  Communicator communicator;
   ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
-
   public SimpleListProperty<Pair<String, Integer>> localScores =
       new SimpleListProperty<>(FXCollections.observableArrayList(scores));
-
-  private ObservableList<Pair<String, Integer>> remoteScores;
   ArrayList<Pair<String, Integer>> remoteScoresList = new ArrayList<>();
 
   Game game;
@@ -59,6 +49,7 @@ public class ScoresScene extends BaseScene {
   ScoresList onlineScoresList;
 
   int newScore;
+  private ObservableList<Pair<String, Integer>> remoteScores;
 
   public ScoresScene(GameWindow window, Game game, ScoresList currentScores) {
     super(window);
@@ -70,8 +61,45 @@ public class ScoresScene extends BaseScene {
 //    Multimedia.playAudio(Multimedia.challengeMusic);
   }
 
-  private static final Logger logger = LogManager.getLogger(ScoresScene.class);
+  private static ArrayList<Pair<String, Integer>> loadScores(File file) {
+    if (!file.exists()) {
+      try {
+        boolean created = file.createNewFile();
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        for (int i = 0; i < 10; i++) {
+          writer.write("NourEldin:" + i * 1000 + "\n");
+        }
+        writer.close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        String[] score = line.split(":");
+        scores.add(new Pair<>(score[0],
+            Integer.parseInt(score[1])));
+      }
 
+      scores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
+    } catch (FileNotFoundException e) {
+      logger.info("File Not Found...");
+    } catch (IOException e) {
+      logger.info("IO Exception...");
+    }
+    return scores;
+  }
+
+  public static Integer getHighScore() {
+    ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
+    if (!scores.isEmpty()) {
+      return scores.get(0).getValue();
+    } else {
+      return 10000;
+    }
+  }
 
   @Override
   public void initialise() {
@@ -87,7 +115,8 @@ public class ScoresScene extends BaseScene {
   }
 
   /**
-   *Generates a VBox depending on the type given
+   * Generates a VBox depending on the type given
+   *
    * @param type type of the score box to be generated
    * @return the score box generated
    */
@@ -125,13 +154,13 @@ public class ScoresScene extends BaseScene {
     return scoreBox;
   }
 
-
-  private VBox buildHighScoreAdding(int highScoreIndexLocal) {
+  private VBox buildHighScoreAdding(int highScoreIndexLocal, VBox leaderBoard) {
     var nameForNewScore = new TextField();
     nameForNewScore.setPromptText("Enter Name");
     nameForNewScore.setPrefWidth(50);
     var submitLocalScore = new Button("Confirm");
-    submitLocalScore.setOnMousePressed(e -> {
+    submitLocalScore.getStyleClass().add("submitButton");
+    submitLocalScore.setOnMouseClicked(e -> {
       if (localScores.size() < 9) {
         localScores.add(new Pair<>(nameForNewScore.getText(), newScore));
       } else {
@@ -139,30 +168,24 @@ public class ScoresScene extends BaseScene {
             newScore));
         localScores.remove(localScores.size() - 1);
       }
+      mainPane.setCenter(leaderBoard);
       writeScores(new File("scores.txt"));
     });
+
     return new VBox(nameForNewScore, submitLocalScore);
   }
 
-
   /**
    * generates an HBox with all the High Score Components
+   *
    * @return An HBox containing all the scoring stuff
    */
   HBox buildScoresBox() {
-    int highScoreIndexLocal = highScoreIndexLocal();
 
     VBox localOrGameScores;
     if (currentGameList == null) {
       localOrGameScores = buildScoreBox("Local Scores");
-      if (highScoreIndexLocal != -1) {
-        //TODO Fix not querying new Score
-        VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal);
-        mainPane.setCenter(addLocalHighScore);
-        addLocalHighScore.getChildren().get(1).setOnMouseReleased(e -> {
-          mainPane.getChildren().remove(addLocalHighScore);
-        });
-      }
+
     } else {
       localOrGameScores = buildScoreBox("This Game");
     }
@@ -172,9 +195,8 @@ public class ScoresScene extends BaseScene {
     allScores.getChildren().addAll(localOrGameScores, onlineScoresBox);
     allScores.setAlignment(Pos.CENTER);
     allScores.setSpacing(20);
-     return allScores;
+    return allScores;
   }
-
 
   @Override
   public void build() {
@@ -185,26 +207,31 @@ public class ScoresScene extends BaseScene {
     scoresPane.getStyleClass().add("scores-background");
     root.getChildren().add(scoresPane);
 
-
     mainPane = new BorderPane();
 
+    int highScoreIndexLocal = highScoreIndexLocal();
 
     var scoresContainer = new VBox();
     scoresContainer.setAlignment(Pos.CENTER);
 
-
     var highScoresText = new Text("HIGHSCORES");
     highScoresText.getStyleClass().add("bigtitle");
 
-
     scoresContainer.getChildren().addAll(highScoresText, buildScoresBox());
 
-    mainPane.setCenter(scoresContainer);
+    if (highScoreIndexLocal != -1) {
+      //TODO Fix not querying new Score
+      VBox addLocalHighScore = buildHighScoreAdding(highScoreIndexLocal, scoresContainer);
+      addLocalHighScore.setVisible(true);
+
+      mainPane.setCenter(addLocalHighScore);
+
+    } else {
+      mainPane.setCenter(scoresContainer);
+    }
 
     scoresPane.getChildren().add(mainPane);
   }
-
-
 
   private int highScoreIndexLocal() {
     for (int i = 0; i < localScores.getSize(); i++) {
@@ -213,38 +240,6 @@ public class ScoresScene extends BaseScene {
       }
     }
     return -1;
-  }
-
-
-  private static ArrayList<Pair<String, Integer>> loadScores(File file) {
-    if (!file.exists()) {
-      try {
-        boolean created = file.createNewFile();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        for (int i = 0; i < 10; i++) {
-          writer.write("NourEldin:" + i * 1000 + "\n");
-        }
-        writer.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    ArrayList<Pair<String, Integer>> scores = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        String[] score = line.split(":");
-        scores.add(new Pair<>(score[0],
-            Integer.parseInt(score[1])));
-      }
-
-      scores.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-    } catch (FileNotFoundException e) {
-      logger.info("File Not Found...");
-    } catch (IOException e) {
-      logger.info("IO Exception...");
-    }
-    return scores;
   }
 
   private void loadOnlineScores() {
@@ -280,15 +275,5 @@ public class ScoresScene extends BaseScene {
 
   private void writeOnlineScore(String nameForNewScore, int newScore) {
     communicator.send("HISCORE " + nameForNewScore + ":" + newScore);
-  }
-
-
-  public static Integer getHighScore() {
-    ArrayList<Pair<String, Integer>> scores = loadScores(scoresFile);
-    if (!scores.isEmpty()) {
-      return scores.get(0).getValue();
-    } else {
-      return 10000;
-    }
   }
 }

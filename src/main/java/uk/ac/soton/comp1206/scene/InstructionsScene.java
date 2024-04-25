@@ -15,10 +15,11 @@ import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
-public class InstructionsScene extends BaseScene{
+public class InstructionsScene extends BaseScene {
 
 
   private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
+
   /**
    * Create a new scene, passing in the GameWindow the scene will be displayed in
    *
@@ -39,7 +40,7 @@ public class InstructionsScene extends BaseScene{
   public void build() {
     logger.info("Building " + this.getClass().getName());
 
-    root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
+    root = new GamePane(gameWindow.getWidth(), gameWindow.getHeight());
 
     var howToPlayPane = new BorderPane();
     howToPlayPane.setMaxWidth(gameWindow.getWidth());
@@ -73,16 +74,16 @@ public class InstructionsScene extends BaseScene{
     root.getChildren().add(howToPlayPane);
   }
 
-  private GridPane generatePieces(){
+  private GridPane generatePieces() {
     var piecesGrid = new GridPane();
     piecesGrid.setAlignment(Pos.CENTER);
     piecesGrid.setVgap(10);
     piecesGrid.setHgap(20);
     int counter = 0;
     piecesGrid.setAlignment(Pos.BOTTOM_CENTER);
-    for(int y = 0; y < 3; y++){
-      for(int x = 0; x < 5; x++){
-        PieceBoard board = new PieceBoard(60,60);
+    for (int y = 0; y < 3; y++) {
+      for (int x = 0; x < 5; x++) {
+        PieceBoard board = new PieceBoard(60, 60);
         board.showPiece(GamePiece.createPiece(counter));
         counter++;
         piecesGrid.add(board, x, y);

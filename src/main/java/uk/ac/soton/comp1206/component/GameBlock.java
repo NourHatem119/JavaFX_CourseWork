@@ -1,6 +1,5 @@
 package uk.ac.soton.comp1206.component;
 
-import javafx.animation.AnimationTimer;
 import javafx.animation.FadeTransition;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -133,7 +132,7 @@ public class GameBlock extends Canvas {
     gc.clearRect(0, 0, width, height);
 
     //Fill
-    gc.setFill(new Color(0.6431372549019608,0.2196078431372549,0.12549019607843137,0.4));
+    gc.setFill(new Color(0.6431372549019608, 0.2196078431372549, 0.12549019607843137, 0.4));
     gc.fillRect(0, 0, width, height);
 
     //Border
@@ -222,7 +221,7 @@ public class GameBlock extends Canvas {
     clear.setToValue(0.0);
     clear.play();
     clear.setOnFinished(e -> {
-      gameBoard.grid.set(getX(),getY(),0);
+      gameBoard.grid.set(getX(), getY(), 0);
       FadeTransition restore = new FadeTransition(Duration.millis(500), this);
       restore.setFromValue(0.0);
       restore.setToValue(1.0);

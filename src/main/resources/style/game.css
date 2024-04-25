@@ -6,9 +6,16 @@
   -fx-background-color: black;
 }
 
-.button{
+.button {
   -fx-background-color: transparent;
   -fx-text-fill: White;
+  -fx-font-family: 'YouMurderer BB';
+  -fx-font-size: 45;
+}
+
+.submitButton {
+  -fx-background-color: transparent;
+  -fx-text-fill: Black;
   -fx-font-family: 'YouMurderer BB';
   -fx-font-size: 45;
 }
@@ -234,7 +241,7 @@ TextField {
 }
 
 .scrollchat {
-  -fx-background-color: rgba(00,00,00,0.25);
-  -fx-background: rgba(00,00,00,0.25);
+  -fx-background-color: rgba(00, 00, 00, 0.25);
+  -fx-background: rgba(00, 00, 00, 0.25);
   -fx-border-color: white;
 }

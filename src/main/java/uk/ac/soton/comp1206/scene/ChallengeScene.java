@@ -48,7 +48,6 @@ public class ChallengeScene extends BaseScene {
   BorderPane mainPane;
 
 
-
   /**
    * Create a new Single Player challenge scene
    *
@@ -58,7 +57,8 @@ public class ChallengeScene extends BaseScene {
     super(gameWindow);
     logger.info("Creating Challenge Scene");
   }
-  protected  HBox buildTopBar(String title){
+
+  protected HBox buildTopBar(String title) {
     var scoreValue = new Text();
     var scoreText = new Text("Score");
     scoreText.getStyleClass().add("heading");
@@ -69,7 +69,6 @@ public class ChallengeScene extends BaseScene {
     livesText.getStyleClass().add("heading");
     var livesBox = new VBox(livesText, livesValue);
     livesBox.setAlignment(Pos.CENTER);
-
 
     var titleTxt = new Text(title);
     titleTxt.getStyleClass().add("title");
@@ -87,7 +86,7 @@ public class ChallengeScene extends BaseScene {
     return topBar;
   }
 
-  protected VBox buildSideBar(){
+  protected VBox buildSideBar() {
     var highScoreText = new Text("HighScore");
     highScoreText.getStyleClass().add("heading");
     var highScoreBox = new VBox(highScoreText);
@@ -156,7 +155,7 @@ public class ChallengeScene extends BaseScene {
     challengePane.getChildren().add(mainPane);
 
     //Set up the main GameBoard, add the main Gameboard and the rightBar.
-    logger.info("Width: {}, Height: {}",gameWindow.getWidth() / 2, gameWindow.getHeight() / 2);
+    logger.info("Width: {}, Height: {}", gameWindow.getWidth() / 2, gameWindow.getHeight() / 2);
     board = new GameBoard(game.getGrid(), gameWindow.getWidth() / 2.0,
         gameWindow.getWidth() / 2.0);
 
@@ -209,7 +208,7 @@ public class ChallengeScene extends BaseScene {
    * Handle when a block is clicked.
    *
    * @param gameBlock The Game Block that was clocked
-   * @param event The mouse event that has occurred
+   * @param event     The mouse event that has occurred
    */
   protected void blockClicked(GameBlock gameBlock, MouseEvent event) {
     boolean canPlay;
@@ -264,7 +263,7 @@ public class ChallengeScene extends BaseScene {
     game.start();
     Multimedia.playBackGroundMusic(Multimedia.challengeMusic);
     scene.setOnKeyPressed(this::keyClicked);
-    if (!(game instanceof MultiplayerGame)){
+    if (!(game instanceof MultiplayerGame)) {
       currentPieceShow.showPiece(game.getCurrentPiece());
       nextPieceShow.showPiece(game.getNextPiece());
     }
@@ -288,11 +287,14 @@ public class ChallengeScene extends BaseScene {
       currentPieceShow.showPiece(game.getCurrentPiece());
     } else if (keyClicked.getCode().equals(KeyCode.UP) || keyClicked.getCode().equals(KeyCode.W)) {
       board.upClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.DOWN) || keyClicked.getCode().equals(KeyCode.S)) {
+    } else if (keyClicked.getCode().equals(KeyCode.DOWN) || keyClicked.getCode()
+        .equals(KeyCode.S)) {
       board.downClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.RIGHT) || keyClicked.getCode().equals(KeyCode.D)) {
+    } else if (keyClicked.getCode().equals(KeyCode.RIGHT) || keyClicked.getCode()
+        .equals(KeyCode.D)) {
       board.rightArrowClicked();
-    } else if (keyClicked.getCode().equals(KeyCode.LEFT) || keyClicked.getCode().equals(KeyCode.A)) {
+    } else if (keyClicked.getCode().equals(KeyCode.LEFT) || keyClicked.getCode()
+        .equals(KeyCode.A)) {
       board.leftArrowClicked();
     } else if (keyClicked.getCode().equals(KeyCode.ENTER) || keyClicked.getCode()
         .equals(KeyCode.X)) {

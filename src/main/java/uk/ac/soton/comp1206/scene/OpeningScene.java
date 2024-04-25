@@ -13,7 +13,7 @@ import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ux.Multimedia;
 
-public class OpeningScene extends BaseScene{
+public class OpeningScene extends BaseScene {
 
   SequentialTransition sequential;
 
@@ -40,7 +40,8 @@ public class OpeningScene extends BaseScene{
     openingPane.setMaxWidth(gameWindow.getWidth());
     openingPane.getStyleClass().add("intro");
     root.getChildren().add(openingPane);
-    ImageView opening = new ImageView(new Image(getClass().getResourceAsStream("/_images/ECSGames.png")));
+    ImageView opening = new ImageView(
+        new Image(getClass().getResourceAsStream("/_images/ECSGames.png")));
     opening.setPreserveRatio(true);
     opening.setFitWidth(400);
     openingPane.getChildren().add(opening);
@@ -51,18 +52,17 @@ public class OpeningScene extends BaseScene{
     FadeTransition fade = new FadeTransition(Duration.millis(500), opening);
     fade.setToValue(0);
 
-    sequential = new SequentialTransition(new Animation[] {(Animation) rotation, (Animation) fade});
+    sequential = new SequentialTransition(new Animation[]{(Animation) rotation, (Animation) fade});
     sequential.play();
     sequential.setOnFinished(e -> {
       Multimedia.stopMusic();
       gameWindow.startMenu();
     });
   }
+
   public void skip(KeyEvent anyKey) {
+    gameWindow.startMenu();
+    sequential.stop();
     Multimedia.stopMusic();
-    Multimedia.audio.setOnEndOfMedia(() -> {
-      gameWindow.startMenu();
-      sequential.stop();
-    });
   }
 }

@@ -10,8 +10,8 @@
 [*] Level works
 [*] Background music
 [*] Menu screen present and functioning
-[ ] Menu screen uses animations and visual effects
-[*?] Menu screen works
+[*] Menu screen uses animations and visual effects
+[*] Menu screen works
 [*] Instructions screen
 [*] Instructions screen shows blocks
 [*] Challenge screen shows current piece
@@ -35,8 +35,8 @@
 [*] Game goes to Scores screen on Game Over
 [*] Scores read from file
 [*] Scores saved to file
-[?] New score prompts for name
-[?] New score inserted into score list
+[*] New score prompts for name
+[*] New score inserted into score list
 [*] High Score to beat shown in Challenge screen
 [*] Online scores shown in Score screen
 [*] Lobby updates games as new ones created

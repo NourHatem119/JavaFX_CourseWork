@@ -1,21 +1,25 @@
 package uk.ac.soton.comp1206.scene;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.MultiplayerGame;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.ui.ScoresList;
-import uk.ac.soton.comp1206.ux.Multimedia;
 
 public class MultiPlayerScene extends ChallengeScene {
 
@@ -27,9 +31,7 @@ public class MultiPlayerScene extends ChallengeScene {
 
   ScoresList currentScores;
 
-  public ScoresList getScores() {
-    return currentScores;
-  }
+  Timer requestScores;
 
   /**
    * Create a new Single Player challenge scene
@@ -41,6 +43,10 @@ public class MultiPlayerScene extends ChallengeScene {
     communicator = gameWindow.getCommunicator();
   }
 
+  public ScoresList getScores() {
+    return currentScores;
+  }
+
   @Override
   public void initialise() {
     super.initialise();
@@ -50,7 +56,7 @@ public class MultiPlayerScene extends ChallengeScene {
             handleScores(message);
           }
         }));
-    getCurrentScores();
+    requestScores();
   }
 
   @Override
@@ -102,7 +108,6 @@ public class MultiPlayerScene extends ChallengeScene {
     String[] playersUpdate = receivedScores.split("\\n");
     logger.info("Players {}", playersUpdate);
 
-//    logger.info("Length {}", players[0].split(":").length);
     for (String player : playersUpdate) {
       String[] playerInfo = player.split(":");
 
@@ -110,10 +115,9 @@ public class MultiPlayerScene extends ChallengeScene {
       for (int j = 0; j < players.size(); j++) {
         Pair<String, Integer> thePlayer = players.get(j);
         if (thePlayer.getKey().equals(playerInfo[0])) {
-          if (playerInfo[2].equals("DEAD") && !deadPlayers.contains(playerInfo[0])) {
+          if (playerInfo[2].contains("DEAD") && !deadPlayers.contains(playerInfo[0])) {
+            logger.info("killing player");
             kill(playerInfo[0]);
-            currentScores.getChildren().get(j).getStyleClass().add("eliminated");
-            //TODO Eliminate Players
           } else {
             players.set(j, new Pair<>(playerInfo[0], Integer.parseInt(playerInfo[1])));
           }
@@ -130,6 +134,33 @@ public class MultiPlayerScene extends ChallengeScene {
     currentPlayers.clear();
     currentPlayers.addAll(this.players);
     logger.info("Players Size:{}", this.players.size());
-    this.currentScores.reveal();
+    this.currentScores.reveal(deadPlayers);
+  }
+
+  private void requestScores() {
+    requestScores = new Timer();
+    TimerTask requestChannels = new TimerTask() {
+      @Override
+      public void run() {
+        getCurrentScores();
+      }
+    };
+    requestScores.schedule(requestChannels, 0, 5000);
+  }
+
+  @Override
+  protected void gameOver(Game currentGame) {
+    super.gameOver(currentGame);
+    requestScores.cancel();
+    requestScores.purge();
+  }
+
+  @Override
+  protected void keyClicked(KeyEvent keyClicked) {
+    super.keyClicked(keyClicked);
+    if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
+      requestScores.cancel();
+      requestScores.purge();
+    }
   }
 }

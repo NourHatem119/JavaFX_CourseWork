@@ -117,7 +117,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   *Handles Sending a message through the ui.
+   * Handles Sending a message through the ui.
    *
    * @param s message received from the Server.
    */
@@ -146,7 +146,7 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   *Handles adding the channels to the ui.
+   * Handles adding the channels to the ui.
    *
    * @param message message received from the Server.
    */
@@ -182,8 +182,8 @@ public class LobbyScene extends BaseScene {
   }
 
   /**
-   * Builds and displays the left panel which contains the channels received from the server,
-   * a button that allows player to create a new channel, and a title.
+   * Builds and displays the left panel which contains the channels received from the server, a
+   * button that allows player to create a new channel, and a title.
    */
   void buildLeftPanel() {
 
@@ -277,7 +277,7 @@ public class LobbyScene extends BaseScene {
    * handles when a key is clicked in the presence of the chat Box.
    *
    * @param chatBox The chatBox that the event happened in its presence
-   * @param e the Event that happened in the presence of the chatBox
+   * @param e       the Event that happened in the presence of the chatBox
    */
   void handleKeyClicked(TextField chatBox, KeyEvent e) {
     if (e.getCode().equals(KeyCode.ENTER)) {
@@ -339,12 +339,12 @@ public class LobbyScene extends BaseScene {
 
     var howToChat = new Text(
         """
-           
+                       
             Welcome to the lobby\s
             Type /nick to change nickname\s
             Type /part to quit the channel\s
             Type /start to start the game
-           
+                       
             """);
 
     chat.getChildren().add(howToChat);
@@ -397,6 +397,7 @@ public class LobbyScene extends BaseScene {
 
   /**
    * handles when a key is casually clicked
+   *
    * @param keyClicked The Key that has been clicked
    */
   @Override
