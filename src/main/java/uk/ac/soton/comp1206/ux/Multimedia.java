@@ -48,6 +48,8 @@ public class Multimedia {
   }
 
   static public void playBackGroundMusic(Media music) {
+    if (Music != null)
+      Music.stop();
     Music = new MediaPlayer(music);
     Music.play();
     Music.setCycleCount(MediaPlayer.INDEFINITE);

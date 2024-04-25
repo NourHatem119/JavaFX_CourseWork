@@ -38,21 +38,20 @@ public class ScoresList extends VBox {
     for (Pair<String, Integer> singleScore : scoresList) {
       logger.info("Item Added {} : {}", singleScore.getKey(), singleScore.getValue());
       Text name = new Text(singleScore.getKey());
+      Text scoreValue = new Text(": " + singleScore.getValue().toString());
       if (deadPlayers != null) {
         if (deadPlayers.contains(singleScore.getKey())) {
           name.setStrikethrough(true);
-
         }
       }
-      Text scoreValue = new Text(": " + singleScore.getValue().toString());
       var score = new HBox(name, scoreValue);
       score.getStyleClass().add("scoreitem");
       FadeTransition transition = new FadeTransition(Duration.millis(250), score);
       transition.setFromValue(0.0);
       transition.setToValue(1.0);
       transitions[index] = transition;
-      scoreValue.setFill(Color.BLACK);
-      name.setFill(Color.BLACK);
+      scoreValue.setFill(Color.YELLOW);
+      name.setFill(Color.YELLOW);
       getChildren().add(score);
       index++;
     }

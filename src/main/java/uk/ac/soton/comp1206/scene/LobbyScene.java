@@ -154,9 +154,10 @@ public class LobbyScene extends BaseScene {
     this.channels.getChildren().clear();
     String[] channels = message.replace("CHANNELS ", "").split("\n");
     channelsNames.addAll(List.of(channels));
+    TextFlow channelsFlow = new TextFlow();
     for (String channel : channels) {
-      var joinChannel = new Button(channel);
-//      channelName.getStyleClass().add("heading");
+      var joinChannel = new Text(channel + "\n");
+      joinChannel.getStyleClass().add("heading");
       joinChannel.setOnMouseClicked(e -> {
         joinChannel(channel);
         if (!joined) {
@@ -164,8 +165,12 @@ public class LobbyScene extends BaseScene {
         }
         host.set(message.contains("HOST"));
       });
-      this.channels.getChildren().add(joinChannel);
+      channelsFlow.getChildren().add(joinChannel);
+
     }
+    ScrollPane channelsPane = new ScrollPane(channelsFlow);
+    channelsPane.getStyleClass().add("scrollchannels");
+    this.channels.getChildren().add(channelsPane);
   }
 
 
@@ -231,7 +236,6 @@ public class LobbyScene extends BaseScene {
     leaveChannel = new Button("Leave");
     startGame.setOnAction(e -> {
       communicator.send("START");
-      startGame();
     });
     leaveChannel.setOnAction(e -> leaveChannel());
   }
