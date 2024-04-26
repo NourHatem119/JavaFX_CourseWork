@@ -22,8 +22,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
@@ -35,8 +33,6 @@ import uk.ac.soton.comp1206.ux.Multimedia;
  * starts the game for the user if started by other players(if not host).
  */
 public class LobbyScene extends BaseScene {
-
-  private static final Logger logger = LogManager.getLogger(LobbyScene.class);
 
   Communicator communicator;
 
@@ -224,13 +220,6 @@ public class LobbyScene extends BaseScene {
     currentGames.getStyleClass().add("title");
 
     createChannel = new Button("Host a new Game");
-    createChannel.hoverProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue) {
-        createChannel.getStyleClass().add("menuItem:hover");
-      } else {
-        createChannel.getStyleClass().remove("menuItem:hover");
-      }
-    });
     createChannel.setOnMouseClicked(e -> {
       leftPanel.getChildren().clear();
       leftPanel.getChildren().addAll(currentGames, createChannel);
@@ -269,9 +258,7 @@ public class LobbyScene extends BaseScene {
 
     startGame = new Button("Start");
     leaveChannel = new Button("Leave");
-    startGame.setOnAction(e -> {
-      communicator.send("START");
-    });
+    startGame.setOnAction(e -> communicator.send("START"));
     leaveChannel.setOnAction(e -> leaveChannel());
   }
 
@@ -388,9 +375,7 @@ public class LobbyScene extends BaseScene {
 
     chat.getChildren().add(howToChat);
 
-    chatBox.setOnKeyPressed(e -> {
-      handleKeyClicked(chatBox, e);
-    });
+    chatBox.setOnKeyPressed(e -> handleKeyClicked(chatBox, e));
   }
 
   /**

@@ -119,15 +119,6 @@ public class MenuScene extends BaseScene {
         exitGame(e);
       }
     });
-    for (Node button : buttons.getChildren()) {
-      button.hoverProperty().addListener((observable, oldValue, newValue) -> {
-        if (newValue) {
-          button.getStyleClass().add("menuItem:hover");
-        } else {
-          button.getStyleClass().remove("menuItem:hover");
-        }
-      });
-    }
   }
 
   /**
