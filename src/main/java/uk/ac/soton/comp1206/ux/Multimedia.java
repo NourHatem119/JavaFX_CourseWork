@@ -56,9 +56,7 @@ public class Multimedia {
    */
   private static MediaPlayer Music;
 
-  public static MediaPlayer getMusic() {
-    return Music;
-  }  /**
+  /**
    * The volume.
    */
   private static Double volume = getVolume();

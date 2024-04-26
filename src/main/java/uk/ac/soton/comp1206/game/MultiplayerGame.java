@@ -2,7 +2,6 @@ package uk.ac.soton.comp1206.game;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Timer;
 import javafx.application.Platform;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,8 +20,6 @@ public class MultiplayerGame extends Game {
    */
   final Queue<GamePiece> pieces = new LinkedList<>();
   Communicator communicator;
-  Timer timer;
-
   /**
    * Create a new Multiplayer game with the specified rows and columns. Creates a corresponding grid
    * model.
@@ -48,6 +45,29 @@ public class MultiplayerGame extends Game {
   @Override
   public void initialiseGame() {
     Platform.runLater(spawnThread);
+  }
+
+  /**
+   * Receives the message containing the requested piece from the server and creates a new piece
+   * object with this message, and adds it synchronously.
+   *
+   * @param pieceNo the number of the piece to be handled
+   */
+  private void handlePiece(String pieceNo) {
+    logger.info("Handle Piece {}", this);
+    pieceNo = pieceNo.replace("PIECE ", "");
+    GamePiece piece = GamePiece.createPiece(Integer.parseInt(pieceNo.trim()));
+    synchronized (pieces) {
+      pieces.add(piece);
+    }
+
+    logger.info("Piece Added ... {}/({})", piece.toString(), pieceNo + 1);
+    String queueContents = "";
+    for (GamePiece gamePiece : pieces) {
+      queueContents = "Queue Contains [";
+      queueContents += gamePiece.toString() + "(" + gamePiece.getValue() + ")";
+    }
+    logger.info(queueContents);
   }  /**
    * Called in initialise to fetch the first 2 pieces and show them thread safely because linked
    * lists are not thread safe.
@@ -71,29 +91,6 @@ public class MultiplayerGame extends Game {
           currentPiece, nextPiece);
     }
   };
-
-  /**
-   * Receives the message containing the requested piece from the server and creates a new piece
-   * object with this message, and adds it synchronously.
-   *
-   * @param pieceNo
-   */
-  private void handlePiece(String pieceNo) {
-    logger.info("Handle Piece {}", this);
-    pieceNo = pieceNo.replace("PIECE ", "");
-    GamePiece piece = GamePiece.createPiece(Integer.parseInt(pieceNo.trim()));
-    synchronized (pieces) {
-      pieces.add(piece);
-    }
-
-    logger.info("Piece Added ... {}/({})", piece.toString(), pieceNo + 1);
-    String queueContents = "";
-    for (GamePiece gamePiece : pieces) {
-      queueContents = "Queue Contains [";
-      queueContents += gamePiece.toString() + "(" + gamePiece.getValue() + ")";
-    }
-    logger.info(queueContents);
-  }
 
   /**
    * Starts the Multiplayer Game.
