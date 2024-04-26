@@ -80,7 +80,7 @@ public class LobbyScene extends BaseScene {
   boolean joined;
 
   /**
-   * Contains the names for all the channels at the currently.
+   * Contains the names for all the channels that exists currently.
    */
   ArrayList<String> channelsNames = new ArrayList<>();
 
@@ -224,6 +224,13 @@ public class LobbyScene extends BaseScene {
     currentGames.getStyleClass().add("title");
 
     createChannel = new Button("Host a new Game");
+    createChannel.hoverProperty().addListener((observable, oldValue, newValue) -> {
+      if (newValue) {
+        createChannel.getStyleClass().add("menuItem:hover");
+      } else {
+        createChannel.getStyleClass().remove("menuItem:hover");
+      }
+    });
     createChannel.setOnMouseClicked(e -> {
       leftPanel.getChildren().clear();
       leftPanel.getChildren().addAll(currentGames, createChannel);
@@ -320,6 +327,7 @@ public class LobbyScene extends BaseScene {
       } else if (chatBox.getText().toLowerCase().startsWith("/nick")) {
         var nick = chatBox.getText().split(" ")[1];
         communicator.send("NICK " + nick);
+        Multimedia.playAudio(Multimedia.notification);
       } else {
         communicator.send("MSG " + chatBox.getText());
       }
@@ -408,6 +416,7 @@ public class LobbyScene extends BaseScene {
    */
   private void leaveChannel() {
     communicator.send("PART");
+    Multimedia.playAudio(Multimedia.notification);
     joined = false;
     leftPanel.getChildren().clear();
     channelChat.getChildren().clear();

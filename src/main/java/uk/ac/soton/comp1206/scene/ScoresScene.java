@@ -15,11 +15,13 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -164,11 +166,31 @@ public class ScoresScene extends BaseScene {
   }
 
   private VBox buildHighScoreAdding(int highScoreIndexLocal, VBox leaderBoard) {
+    var title = new Text("Congratulations!!\n You've got a new \nHighScore!!");
+    title.setTextAlignment(TextAlignment.CENTER);
+    title.getStyleClass().add("bigtitle");
     var nameForNewScore = new TextField();
     nameForNewScore.setPromptText("Enter Name");
     nameForNewScore.setPrefWidth(50);
     var submitLocalScore = new Button("Confirm");
     submitLocalScore.getStyleClass().add("submitButton");
+    nameForNewScore.setOnKeyPressed(e -> {
+      if (e.getCode().equals(KeyCode.ENTER)) {
+        if (localScores.size() < 9) {
+          localScores.add(new Pair<>(nameForNewScore.getText(), newScore));
+        } else {
+          localScores.add(highScoreIndexLocal, new Pair<>(nameForNewScore.getText(),
+              newScore));
+          localScores.remove(localScores.size() - 1);
+        }
+        mainPane.setCenter(leaderBoard);
+        writeScores(new File("scores.txt"));
+      } else if (e.getCode().equals(KeyCode.ESCAPE)) {
+        e.consume();
+        mainPane.setCenter(leaderBoard);
+        writeScores(new File("scores.txt"));
+      }
+    });
     submitLocalScore.setOnMouseClicked(e -> {
       if (localScores.size() < 9) {
         localScores.add(new Pair<>(nameForNewScore.getText(), newScore));
@@ -179,9 +201,11 @@ public class ScoresScene extends BaseScene {
       }
       mainPane.setCenter(leaderBoard);
       writeScores(new File("scores.txt"));
-    });
 
-    return new VBox(nameForNewScore, submitLocalScore);
+    });
+    var addScoreBox = new VBox(title, nameForNewScore, submitLocalScore);
+    addScoreBox.setAlignment(Pos.CENTER);
+    return addScoreBox;
   }
 
   /**
@@ -222,10 +246,12 @@ public class ScoresScene extends BaseScene {
     var scoresContainer = new VBox();
     scoresContainer.setAlignment(Pos.CENTER);
 
+    var gameOverText = new Text("GameOver");
     var highScoresText = new Text("HIGHSCORES");
-    highScoresText.getStyleClass().add("bigtitle");
+    highScoresText.getStyleClass().add("highscore");
+    gameOverText.getStyleClass().add("gameover");
 
-    scoresContainer.getChildren().addAll(highScoresText, buildScoresBox());
+    scoresContainer.getChildren().addAll(gameOverText, highScoresText, buildScoresBox());
 
     if (currentGameList == null) {
       if (highScoreIndexLocal != -1) {

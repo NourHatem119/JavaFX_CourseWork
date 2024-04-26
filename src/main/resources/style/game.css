@@ -13,6 +13,10 @@
   -fx-font-size: 45;
 }
 
+.button:hover {
+  -fx-text-fill: #880808;
+}
+
 .volume {
   -fx-background-color: transparent;
   -fx-fill: White;
@@ -65,7 +69,7 @@
 }
 
 .menuItem:hover {
-  -fx-fill: yellow;
+  -fx-text-fill: #880808;
 }
 
 .menuItem.selected {
@@ -276,4 +280,24 @@ TextField {
 .scrollchannels {
   -fx-background-color: rgba(00, 00, 00, 0);
   -fx-background: rgba(00, 00, 00, 0);
+}
+
+.highscore {
+  -fx-fill: yellow;
+  -fx-font-family: 'Orbitron';
+  -fx-font-size: 26px;
+  -fx-font-weight: 700;
+  -fx-border-color: black;
+  -fx-stroke: black;
+  -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+}
+
+.gameover {
+  -fx-fill: Black;
+  -fx-font-family: 'YouMurderer BB';
+  -fx-font-size: 64px;
+  -fx-font-weight: 900;
+  -fx-border-color: white;
+  -fx-stroke: white;
+  -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
 }
