@@ -32,9 +32,7 @@ public class ScoresList extends VBox {
     this.getStyleClass().add("scorelist");
     this.setSpacing(5);
     scoresList = new SimpleListProperty<>(FXCollections.observableList(new ArrayList<>()));
-    scoresList.addListener((observable, oldValue, newValue) -> {
-      reveal(null);
-    });
+    scoresList.addListener((observable, oldValue, newValue) -> reveal(null));
   }
 
   /**

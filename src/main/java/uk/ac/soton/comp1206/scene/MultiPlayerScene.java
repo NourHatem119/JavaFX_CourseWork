@@ -1,14 +1,11 @@
 package uk.ac.soton.comp1206.scene;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -38,11 +35,6 @@ public class MultiPlayerScene extends ChallengeScene {
   ScoresList currentScores;
 
   /**
-   * A timer to periodically request scores.
-   */
-  Timer requestScores;
-
-  /**
    * Create a new Single Player challenge scene
    *
    * @param gameWindow the Game Window
@@ -68,7 +60,11 @@ public class MultiPlayerScene extends ChallengeScene {
             handleScores(message);
           }
         }));
-    requestScores();
+    getCurrentScores();
+    game.scoreProperty().addListener((observable, oldValue, newValue) -> {
+      getCurrentScores();
+      currentScores.reveal(deadPlayers);
+    });
   }
 
   /**
@@ -168,19 +164,6 @@ public class MultiPlayerScene extends ChallengeScene {
     this.currentScores.reveal(deadPlayers);
   }
 
-  /**
-   * Create a timer that Periodically request the list of scores from the server.
-   */
-  private void requestScores() {
-    requestScores = new Timer();
-    TimerTask requestChannels = new TimerTask() {
-      @Override
-      public void run() {
-        getCurrentScores();
-      }
-    };
-    requestScores.schedule(requestChannels, 0, 5000);
-  }
 
   /**
    * Calls the challenge scene's gameOver and cancels the timer that requests the scores.
@@ -190,8 +173,6 @@ public class MultiPlayerScene extends ChallengeScene {
   @Override
   protected void gameOver(Game currentGame) {
     super.gameOver(currentGame);
-    requestScores.cancel();
-    requestScores.purge();
   }
 
   /**
@@ -203,9 +184,5 @@ public class MultiPlayerScene extends ChallengeScene {
   @Override
   protected void keyClicked(KeyEvent keyClicked) {
     super.keyClicked(keyClicked);
-    if (keyClicked.getCode().equals(KeyCode.ESCAPE)) {
-      requestScores.cancel();
-      requestScores.purge();
-    }
   }
 }
